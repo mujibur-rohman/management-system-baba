@@ -24,7 +24,10 @@ export class RegisterDto {
   @IsNotEmpty({ message: 'Id Member is required.' })
   idMember: string;
 
-  @IsNotEmpty({ message: 'Role is required.' })
+  @IsOptional()
+  parentId: number;
+
+  @IsOptional()
   @IsIn(Object.values(ROLES))
   role: string;
 }

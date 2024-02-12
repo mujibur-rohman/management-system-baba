@@ -25,7 +25,7 @@ export class AuthService {
     private readonly emailService: EmailService,
   ) {}
   async register(registerDto: RegisterDto) {
-    const { name, password, idMember } = registerDto;
+    const { name, password, idMember, parentId, role } = registerDto;
 
     const isIdExist = await this.prisma.user.findUnique({
       where: {
@@ -44,7 +44,8 @@ export class AuthService {
         name,
         password: hashedPassword,
         idMember,
-        role: ROLES.SUPPLIER,
+        role: role ? role : ROLES.SUPPLIER,
+        parentId,
       },
     });
 
@@ -75,7 +76,7 @@ export class AuthService {
       );
       return await token.getToken(user);
     } else {
-      throw new BadRequestException('Invalid Email or Password');
+      throw new BadRequestException('Invalid Id Member or Password');
     }
   }
 

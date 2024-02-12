@@ -8,9 +8,10 @@ import { AuthController } from './auth.controller';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { MemberModule } from 'src/member/member.module';
 
 @Module({
-  imports: [JwtModule.register({}), PassportModule],
+  imports: [JwtModule.register({}), PassportModule, MemberModule],
   providers: [
     AuthService,
     JwtService,

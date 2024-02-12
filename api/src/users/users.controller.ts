@@ -16,14 +16,14 @@ import { AvatarDto, ChangeNameDto, ChangePasswordDto } from './dto/users.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { saveAvatarToStorage } from 'src/utils/storage-files';
 import { AccessTokenGuard } from 'src/guards/access-token.guard';
-import { AdminGuard } from 'src/guards/admin.guard';
+import { SupplierGuard } from 'src/guards/supplier.guard';
 import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @UseGuards(AdminGuard)
+  @UseGuards(SupplierGuard)
   @UseGuards(AccessTokenGuard)
   @Get()
   async getUsers() {
@@ -33,7 +33,7 @@ export class UsersController {
   @Put('/change-password/:id')
   async changePassword(
     @Body() changePasswordDto: ChangePasswordDto,
-    @Param('id') id: number,
+    @Param('id') id: string,
   ) {
     const result = await this.userService.changePassword({
       changePasswordDto,
@@ -45,7 +45,7 @@ export class UsersController {
   @Put('/change-name/:id')
   async changeName(
     @Body() changeNameDto: ChangeNameDto,
-    @Param('id') id: number,
+    @Param('id') id: string,
   ) {
     const result = await this.userService.changeName({
       changeNameDto,

@@ -7,9 +7,10 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
+import ROLES from 'src/auth/types/role';
 
 @Injectable()
-export class AdminGuard implements CanActivate {
+export class SupplierGuard implements CanActivate {
   constructor(
     private readonly config: ConfigService,
     private readonly jwt: JwtService,
@@ -24,6 +25,6 @@ export class AdminGuard implements CanActivate {
       throw new ForbiddenException('Invalid tokennn!');
     }
     const user: User = decoded.user;
-    return user.role === 'admin';
+    return user.role === ROLES.SUPPLIER;
   }
 }

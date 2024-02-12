@@ -17,12 +17,12 @@ export class UsersService {
     id,
     changeNameDto,
   }: {
-    id: number;
+    id: string;
     changeNameDto: ChangeNameDto;
   }) {
     const user = await this.prisma.user.findFirst({
       where: {
-        id,
+        id: parseInt(id),
       },
     });
 
@@ -47,12 +47,12 @@ export class UsersService {
     id,
     changePasswordDto,
   }: {
-    id: number;
+    id: string;
     changePasswordDto: ChangePasswordDto;
   }) {
     const user = await this.prisma.user.findFirst({
       where: {
-        id,
+        id: parseInt(id),
       },
     });
 
