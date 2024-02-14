@@ -1,12 +1,12 @@
 export class User {
   id: number;
-  uuid: string;
   name: string;
+  idMember: string;
   email: string;
   password: string;
   avatar?: Avatars | null;
   role: string;
-  address: string;
+  parentId: number;
   createdAt: Date;
   updatedAt: Date;
 }

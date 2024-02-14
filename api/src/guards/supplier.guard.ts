@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import ROLES from 'src/auth/types/role';
+import STATUS_MEMBER from 'src/types/status-member';
 
 @Injectable()
 export class SupplierGuard implements CanActivate {
@@ -25,6 +25,6 @@ export class SupplierGuard implements CanActivate {
       throw new ForbiddenException('Invalid tokennn!');
     }
     const user: User = decoded.user;
-    return user.role === ROLES.SUPPLIER;
+    return user.role === STATUS_MEMBER[0].name;
   }
 }

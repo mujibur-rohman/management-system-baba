@@ -6,7 +6,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import ROLES from '../types/role';
+import STATUS_MEMBER from 'src/types/status-member';
 
 export class RegisterDto {
   @IsNotEmpty({ message: 'Name is required.' })
@@ -24,11 +24,14 @@ export class RegisterDto {
   @IsNotEmpty({ message: 'Id Member is required.' })
   idMember: string;
 
+  @IsNotEmpty({ message: 'Join Date is required.' })
+  joinDate: Date;
+
   @IsOptional()
   parentId: number;
 
   @IsOptional()
-  @IsIn(Object.values(ROLES))
+  @IsIn(STATUS_MEMBER.map((s) => s.name))
   role: string;
 }
 

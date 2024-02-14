@@ -14,7 +14,7 @@ import {
   RegisterDto,
   ResetPasswordDto,
 } from './dto/auth.dto';
-import ROLES from './types/role';
+import STATUS_MEMBER from 'src/types/status-member';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +25,7 @@ export class AuthService {
     private readonly emailService: EmailService,
   ) {}
   async register(registerDto: RegisterDto) {
-    const { name, password, idMember, parentId, role } = registerDto;
+    const { name, password, idMember, parentId, joinDate } = registerDto;
 
     const isIdExist = await this.prisma.user.findUnique({
       where: {
@@ -44,8 +44,13 @@ export class AuthService {
         name,
         password: hashedPassword,
         idMember,
-        role: role ? role : ROLES.SUPPLIER,
+        role: STATUS_MEMBER[0].name,
         parentId,
+        joinDate: new Date(joinDate),
+      },
+      select: {
+        name: true,
+        idMember: true,
       },
     });
 

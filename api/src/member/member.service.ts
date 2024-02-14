@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 import { RegisterDto } from 'src/auth/dto/auth.dto';
-import ROLES from 'src/auth/types/role';
+import STATUS_MEMBER from 'src/types/status-member';
 import { User } from 'src/users/types/user.type';
 
 @Injectable()
@@ -12,6 +12,12 @@ export class MemberService {
     private readonly authService: AuthService,
   ) {}
 
+  getStatusMemberBellow(status: string) {
+    const myStatus = STATUS_MEMBER.find((s) => s.name === status);
+    const bellowStatus = STATUS_MEMBER.find((s) => s.id === myStatus.id + 1);
+    return bellowStatus;
+  }
+
   async registerMember(registerDto: RegisterDto, userData: { user: User }) {
     const { user } = await this.authService.register({
       name: registerDto.name,
@@ -19,7 +25,8 @@ export class MemberService {
       idMember: registerDto.idMember,
       email: null,
       parentId: userData.user?.id || null,
-      role: ROLES.RESELLER,
+      role: this.getStatusMemberBellow(userData.user.role).name,
+      joinDate: new Date(),
     });
     return user;
   }
@@ -70,9 +77,15 @@ export class MemberService {
         data: members,
       };
     } else if (type === 'hierarchy') {
-      return {
-        hehe: 'hi',
-      };
+      const members = await this.prisma.user.findMany({
+        where: {
+          parentId: userData.user.id,
+          name: {
+            contains: q,
+          },
+        },
+      });
+      return members;
     } else {
       throw new BadRequestException('type must be hierarchy or table');
     }

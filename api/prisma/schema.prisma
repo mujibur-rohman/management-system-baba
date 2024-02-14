@@ -27,11 +27,11 @@ model User {
   avatar       Avatars?
   role         String    
   token        String?    @db.LongText()
+  joinDate     DateTime   @db.Date()
   parentId     Int?
   profile      UserProfile?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  
 }
 
 model UserProfile {
