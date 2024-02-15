@@ -25,7 +25,7 @@ export class AuthService {
     private readonly emailService: EmailService,
   ) {}
   async register(registerDto: RegisterDto) {
-    const { name, password, idMember, parentId, joinDate } = registerDto;
+    const { name, password, idMember, parentId, joinDate, role } = registerDto;
 
     const isIdExist = await this.prisma.user.findUnique({
       where: {
@@ -44,7 +44,7 @@ export class AuthService {
         name,
         password: hashedPassword,
         idMember,
-        role: STATUS_MEMBER[0].name,
+        role: role ? role : STATUS_MEMBER[0].name,
         parentId,
         joinDate: new Date(joinDate),
       },

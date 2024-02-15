@@ -19,13 +19,16 @@ export class MemberService {
   }
 
   async registerMember(registerDto: RegisterDto, userData: { user: User }) {
+    console.log(registerDto);
     const { user } = await this.authService.register({
       name: registerDto.name,
       password: registerDto.password,
       idMember: registerDto.idMember,
       email: null,
       parentId: userData.user?.id || null,
-      role: this.getStatusMemberBellow(userData.user.role).name,
+      role: registerDto.role
+        ? registerDto.role
+        : this.getStatusMemberBellow(userData.user.role).name,
       joinDate: new Date(),
     });
     return user;
@@ -77,17 +80,33 @@ export class MemberService {
         data: members,
       };
     } else if (type === 'hierarchy') {
-      const members = await this.prisma.user.findMany({
-        where: {
-          parentId: userData.user.id,
-          name: {
-            contains: q,
-          },
-        },
-      });
-      return members;
+      const topLevelMembers = await this.fetchNestedMembers(userData.user.id);
+      return topLevelMembers;
     } else {
       throw new BadRequestException('type must be hierarchy or table');
     }
+  }
+
+  async fetchNestedMembers(id: any) {
+    const members = await this.prisma.user.findMany({
+      where: {
+        parentId: id,
+      },
+    });
+
+    if (members.length === 0) {
+      return [];
+    }
+
+    const nestedMembersPromises = members.map(async (member) => {
+      const children = await this.fetchNestedMembers(member.id);
+      const tempData: any = member;
+      if (children.length > 0) {
+        tempData.children = children;
+      }
+      return tempData;
+    });
+
+    return Promise.all(nestedMembersPromises);
   }
 }
