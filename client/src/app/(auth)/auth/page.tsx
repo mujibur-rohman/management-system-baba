@@ -10,13 +10,14 @@ import { Input } from "@/components/ui/input";
 import AuthService from "@/services/auth/auth.service";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
-  idMember: z.string(),
-  password: z.string().min(6),
+  idMember: z.string().min(1, "id member harus diisi"),
+  password: z.string().min(6, "minimal 6 karakter"),
 });
 
-function GatePage() {
+function AuthPage() {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,7 +57,13 @@ function GatePage() {
                 <FormItem>
                   <FormLabel>ID Member</FormLabel>
                   <FormControl>
-                    <Input placeholder="ID Member" {...field} />
+                    <Input
+                      className={cn({
+                        "border-destructive": form.formState.errors.idMember,
+                      })}
+                      placeholder="ID Member"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -69,7 +76,14 @@ function GatePage() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="Password" type="password" {...field} />
+                    <Input
+                      className={cn({
+                        "border-destructive": form.formState.errors.password,
+                      })}
+                      placeholder="Password"
+                      type="password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -88,4 +102,4 @@ function GatePage() {
   );
 }
 
-export default GatePage;
+export default AuthPage;

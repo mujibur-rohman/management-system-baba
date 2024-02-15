@@ -12,10 +12,24 @@ export class JWTToken {
   ) {}
 
   public async getToken(user: User) {
+    let parent;
+    if (user.parentId) {
+      parent = await this.prisma.user.findUnique({
+        where: {
+          id: user.parentId,
+        },
+        select: {
+          name: true,
+          id: true,
+          idMember: true,
+        },
+      });
+    }
     const [accessToken, refreshToken] = await Promise.all([
       this.jwt.signAsync(
         {
-          user,
+          ...user,
+          parent,
         },
         {
           secret: this.config.get<string>('ACCESS_TOKEN_SECRET'),
@@ -24,7 +38,8 @@ export class JWTToken {
       ),
       this.jwt.signAsync(
         {
-          user,
+          ...user,
+          parent,
         },
         {
           secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
@@ -32,7 +47,14 @@ export class JWTToken {
         },
       ),
     ]);
-    return { user, accessToken, refreshToken };
+    return {
+      user: {
+        ...user,
+        parent,
+      },
+      accessToken,
+      refreshToken,
+    };
   }
 
   public async getRefreshToken(token: string) {

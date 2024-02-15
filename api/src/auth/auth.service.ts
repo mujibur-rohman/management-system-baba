@@ -81,7 +81,7 @@ export class AuthService {
       );
       return await token.getToken(user);
     } else {
-      throw new BadRequestException('Invalid Id Member or Password');
+      throw new BadRequestException('id member atau password salah');
     }
   }
 

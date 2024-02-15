@@ -63,7 +63,7 @@ export class UsersService {
     if (
       !(await comparePassword(changePasswordDto.oldPassword, user.password))
     ) {
-      throw new BadRequestException('Wrong password!');
+      throw new BadRequestException('Password salah!');
     }
 
     const hashedNewPassword = await bcrypt.hash(
@@ -91,7 +91,7 @@ export class UsersService {
 
     const user = await this.prisma.user.findFirst({
       where: {
-        id: userId,
+        id: userId * 1,
       },
     });
 
@@ -102,7 +102,7 @@ export class UsersService {
 
     const availableAvatar = await this.prisma.avatars.findFirst({
       where: {
-        userId: user.id,
+        userId: user.id * 1,
       },
     });
 

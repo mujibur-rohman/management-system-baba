@@ -18,7 +18,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     const user = Cookies.get("_user") as string;
     if (!user) {
       auth.logout();
-      router.replace("/gate");
+      router.replace("/auth");
       return;
     }
     const currentUser = decryptData(user);

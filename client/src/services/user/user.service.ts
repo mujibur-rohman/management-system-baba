@@ -18,13 +18,17 @@ const UserService = {
     }>("/users/avatar", formData);
     return res.data;
   },
-  changeName: async (payload: { userId: string; name: string }) => {
+  changeName: async (payload: { userId: number; name: string }) => {
     const res = await axiosInitialize.put<{
       message: string;
       data: {
         name: string;
       };
     }>(`/users/change-name/${payload.userId}`, { name: payload.name });
+    return res.data;
+  },
+  changePassword: async (payload: { oldPassword: string; newPassword: string; userId: number }) => {
+    const res = await axiosInitialize.put(`/users/change-password/${payload.userId}`, { oldPassword: payload.oldPassword, newPassword: payload.newPassword });
     return res.data;
   },
 };

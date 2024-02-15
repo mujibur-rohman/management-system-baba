@@ -5,6 +5,8 @@ export type User = {
     path: string;
   };
   idMember: string;
+  parentId: string;
+  joinDate: Date;
   name: string;
   email: string;
   password: string;
@@ -12,4 +14,9 @@ export type User = {
   token: string;
   createdAt: Date;
   updatedAt: Date;
+  parent?: {
+    id: number;
+    name: string;
+    idMember: number;
+  };
 };

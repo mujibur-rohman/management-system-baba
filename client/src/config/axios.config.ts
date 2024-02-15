@@ -39,11 +39,9 @@ axiosInitialize.interceptors.response.use(
             },
             body: JSON.stringify({
               token: auth.getRefreshToken(),
-              userId: auth.currentUser()?.uuid,
+              userId: auth.currentUser()?.id,
             }),
           }).then((res) => res.json());
-
-          console.log(refreshTokenResponse);
 
           auth.refreshLogin(refreshTokenResponse);
 

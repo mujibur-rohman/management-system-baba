@@ -12,6 +12,7 @@ class AuthService {
       idMember,
       password,
     });
+
     const userEncrypted = encryptData(JSON.stringify(response.data.user));
 
     // * store token to cookie
@@ -52,7 +53,6 @@ class AuthService {
     if (!user) {
       this.logout();
     }
-    console.log(user);
     const currentUser = decryptData(user);
     if (!currentUser) {
       return null;
