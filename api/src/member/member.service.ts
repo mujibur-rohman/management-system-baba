@@ -4,6 +4,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { RegisterDto } from 'src/auth/dto/auth.dto';
 import STATUS_MEMBER from 'src/types/status-member';
 import { User } from 'src/users/types/user.type';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class MemberService {
@@ -18,19 +19,23 @@ export class MemberService {
     return bellowStatus;
   }
 
-  async registerMember(registerDto: RegisterDto, userData: { user: User }) {
+  async registerMember(registerDto: RegisterDto, userData: User) {
+    console.log(userData);
     const { user } = await this.authService.register({
       name: registerDto.name,
       password: registerDto.password,
       idMember: registerDto.idMember,
       email: null,
-      parentId: userData.user?.id || null,
+      parentId: userData.id || null,
       role: registerDto.role
         ? registerDto.role
-        : this.getStatusMemberBellow(userData.user.role).name,
+        : this.getStatusMemberBellow(userData.role).name,
       joinDate: new Date(),
     });
-    return user;
+    return {
+      data: user,
+      message: 'Member berhasil didaftarkan',
+    };
   }
 
   async getMyMember({
@@ -127,5 +132,58 @@ export class MemberService {
     });
 
     return Promise.all(nestedMembersPromises);
+  }
+
+  async resetPassword({ id, password }: { id: string; password: string }) {
+    if (!id || !password) {
+      throw new BadRequestException('id or password is required');
+    }
+
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    console.log(password);
+
+    const hashedNewPassword = await bcrypt.hash(password, 10);
+
+    await this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        password: hashedNewPassword,
+      },
+    });
+
+    return { message: `Password berhasil direset` };
+  }
+
+  async deleteMember(id: string) {
+    if (!id) {
+      throw new BadRequestException('id is required');
+    }
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    await this.prisma.user.delete({
+      where: {
+        id: user.id,
+      },
+    });
+
+    return { message: `Member berhasil dihapus` };
   }
 }

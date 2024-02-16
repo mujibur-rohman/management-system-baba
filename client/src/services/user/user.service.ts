@@ -5,7 +5,7 @@ export const USER_PATHNAME = "/users";
 
 const UserService = {
   getAll: async () => {
-    const res = await axiosInitialize.get<User[]>("/users");
+    const res = await axiosInitialize.get<User[]>(USER_PATHNAME);
     return res.data;
   },
   changeAvatar: async (formData: FormData) => {

@@ -15,6 +15,22 @@ const MemberService = {
     });
     return res.data;
   },
+  addMember: async (payload: any) => {
+    const res = await axiosInitialize.post<{
+      message: string;
+      data: {
+        name: string;
+        idMember: number;
+      };
+    }>(`${MEMBER_PATHNAME}/register`, payload);
+    return res.data;
+  },
+  deleteMember: async (id: string) => {
+    const res = await axiosInitialize.delete<{
+      message: string;
+    }>(`${MEMBER_PATHNAME}/${id}`);
+    return res.data;
+  },
 };
 
 export default MemberService;

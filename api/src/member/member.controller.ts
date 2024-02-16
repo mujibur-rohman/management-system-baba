@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Query,
   Req,
@@ -54,6 +56,26 @@ export class MemberController {
       request.user as any,
     );
 
+    return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete('/:id')
+  async deleteMember(@Param('id') id: string) {
+    const result = this.memberService.deleteMember(id);
+    return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('/:id')
+  async resetPassword(
+    @Param('id') id: string,
+    @Body() body: { password: string },
+  ) {
+    const result = this.memberService.resetPassword({
+      id,
+      password: body.password,
+    });
     return result;
   }
 }

@@ -37,7 +37,7 @@ export const columns: ColumnDef<MemberTypesProfile>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      return <ActionCell />;
+      return <ActionCell id={row.original.id.toString()} />;
     },
   },
 ];
