@@ -12,11 +12,11 @@ function Navigation() {
         <HomeIcon />
         <span className="text-xs">Dashboard</span>
       </Link>
-      <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
+      <Link href="/product" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
         <Package2Icon />
         <span className="text-xs">Produk</span>
       </Link>
-      <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
+      <Link href="/member" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
         <User2Icon />
         <span className="text-xs">Member</span>
       </Link>

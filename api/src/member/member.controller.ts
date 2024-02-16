@@ -34,7 +34,7 @@ export class MemberController {
       limit: limit * 1,
       page: page * 1,
       q,
-      userData: request.user as any,
+      userData: request as any,
       type: type as 'hierarchy' | 'table',
     });
   }

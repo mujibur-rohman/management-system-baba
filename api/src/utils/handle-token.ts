@@ -33,7 +33,7 @@ export class JWTToken {
         },
         {
           secret: this.config.get<string>('ACCESS_TOKEN_SECRET'),
-          expiresIn: '1h',
+          expiresIn: '20s',
         },
       ),
       this.jwt.signAsync(
@@ -65,7 +65,7 @@ export class JWTToken {
 
     const user = await this.prisma.user.findFirst({
       where: {
-        id: decoded.user.id,
+        id: decoded.id,
       },
       include: {
         avatar: true,

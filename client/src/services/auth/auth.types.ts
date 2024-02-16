@@ -5,3 +5,9 @@ export type LoginResponse = {
   accessToken: string;
   refreshToken: string;
 };
+
+export const STATUS_MEMBER = {
+  SUPPLIER: "supplier",
+  DISTRIBUTOR: "distributor",
+  RESELLER: "reseller",
+};

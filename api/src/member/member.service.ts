@@ -69,6 +69,18 @@ export class MemberService {
         },
         skip: offset,
         take: limit,
+        select: {
+          id: true,
+          avatar: true,
+          idMember: true,
+          name: true,
+          parentId: true,
+          joinDate: true,
+          role: true,
+        },
+        orderBy: {
+          name: 'asc',
+        },
       });
 
       return {
@@ -90,6 +102,14 @@ export class MemberService {
     const members = await this.prisma.user.findMany({
       where: {
         parentId: id,
+      },
+      select: {
+        id: true,
+        avatar: true,
+        idMember: true,
+        name: true,
+        parentId: true,
+        joinDate: true,
       },
     });
 
