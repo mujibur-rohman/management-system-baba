@@ -28,6 +28,13 @@ function ActionCell({ id }: { id: string }) {
         setLoading(false);
         setOpenDialog(false);
         break;
+      case "reset":
+        const resetResponse = await MemberService.resetPassword(id, "babaparfum");
+        queryClient.invalidateQueries({ queryKey: ["member"] });
+        toast.success(resetResponse.message);
+        setLoading(false);
+        setOpenDialog(false);
+        break;
       default:
         break;
     }

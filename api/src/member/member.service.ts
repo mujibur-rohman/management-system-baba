@@ -97,7 +97,13 @@ export class MemberService {
       };
     } else if (type === 'hierarchy') {
       const topLevelMembers = await this.fetchNestedMembers(userData.user.id);
-      return topLevelMembers;
+      return {
+        page: 0,
+        limit: 0,
+        totalRows: topLevelMembers.length,
+        totalPage: 0,
+        data: topLevelMembers,
+      };
     } else {
       throw new BadRequestException('type must be hierarchy or table');
     }
@@ -115,6 +121,7 @@ export class MemberService {
         name: true,
         parentId: true,
         joinDate: true,
+        role: true,
       },
     });
 
@@ -148,7 +155,6 @@ export class MemberService {
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    console.log(password);
 
     const hashedNewPassword = await bcrypt.hash(password, 10);
 

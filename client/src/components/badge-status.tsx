@@ -5,13 +5,29 @@ import { Badge } from "./ui/badge";
 function BadgeStatus({ role }: { role: keyof typeof STATUS_MEMBER }) {
   switch (role) {
     case "SUPPLIER":
-      return <Badge variant="warning">{role}</Badge>;
+      return (
+        <Badge className="text-xs" variant="warning">
+          {role}
+        </Badge>
+      );
     case "DISTRIBUTOR":
-      return <Badge variant="success">{role}</Badge>;
+      return (
+        <Badge className="text-xs" variant="success">
+          {role}
+        </Badge>
+      );
     case "RESELLER":
-      return <Badge variant="info">{role}</Badge>;
+      return (
+        <Badge className="text-xs" variant="info">
+          {role}
+        </Badge>
+      );
     default:
-      return <Badge variant="default">{role}</Badge>;
+      return (
+        <Badge className="text-xs" variant="default">
+          {role}
+        </Badge>
+      );
   }
 }
 

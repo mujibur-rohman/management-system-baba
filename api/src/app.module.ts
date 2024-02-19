@@ -14,6 +14,7 @@ import { MemberController } from './member/member.controller';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { JwtService } from '@nestjs/jwt';
     }),
     AuthModule,
     MemberModule,
+    ProductModule,
   ],
   controllers: [AppController, MemberController],
   providers: [

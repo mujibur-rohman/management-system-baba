@@ -7,17 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MemberService from "@/services/member/member.service";
 import { useQuery } from "@tanstack/react-query";
-import { PlusIcon, RefreshCwIcon } from "lucide-react";
-import Link from "next/link";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { RefreshCwIcon } from "lucide-react";
+import React, { ChangeEvent, useState } from "react";
 import { columns } from "./_components/columns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/useDebounce";
 import AddMember from "./_components/add-member";
+import { cn } from "@/lib/utils";
+import Hierarchy from "./_components/hierarchy";
 
 function MemberPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState<string>("");
+  const [typeView, setTypeView] = useState<"table" | "hierarchy">("table");
   const debouncedValue = useDebounce<string>(search, 300);
 
   const {
@@ -27,9 +29,9 @@ function MemberPage() {
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: ["member", currentPage, debouncedValue],
+    queryKey: ["member", currentPage, debouncedValue, typeView],
     queryFn: async () => {
-      return await MemberService.getMyMember({ limit: 10, page: currentPage, q: debouncedValue, type: "table" });
+      return await MemberService.getMyMember({ limit: 2, page: currentPage, q: debouncedValue, type: typeView });
     },
   });
 
@@ -43,16 +45,43 @@ function MemberPage() {
     setSearch(event.target.value);
   };
 
+  console.log(members);
+
   return (
     <AppWrapper className="pb-20">
       <div className="py-5 flex justify-between">
         <h1 className="text-xl md:text-2xl font-bold">Member</h1>
         <AddMember />
       </div>
+      <div className="my-3">
+        <span className="text-xl font-medium">Total Member : {members?.totalRows}</span>
+      </div>
       <div className="border rounded-lg p-5">
-        <div className="flex justify-between mb-4">
-          <Input className="w-[180px]" placeholder="Search" value={search} onChange={handleChange} />
-          {/* <SelectFilter /> */}
+        <div
+          className={cn("flex flex-col md:flex-row gap-3 mb-4", {
+            "justify-between": typeView === "table",
+            "justify-end": typeView === "hierarchy",
+          })}
+        >
+          <div className="flex gap-2 bg-border rounded-md p-1 md:w-[280px] md:order-2">
+            <div
+              className={cn("rounded-md p-1 w-full text-center font-medium cursor-pointer", {
+                "bg-background": typeView === "table",
+              })}
+              onClick={() => setTypeView("table")}
+            >
+              Tabel
+            </div>
+            <div
+              className={cn("rounded-md p-1 w-full text-center font-medium cursor-pointer", {
+                "bg-background": typeView === "hierarchy",
+              })}
+              onClick={() => setTypeView("hierarchy")}
+            >
+              Hirarki
+            </div>
+          </div>
+          <Input className={cn("w-[180px] md:order-1", { hidden: typeView === "hierarchy" })} placeholder="Search" value={search} onChange={handleChange} />
         </div>
         {isLoading ? (
           <div className="space-y-2">
@@ -73,13 +102,15 @@ function MemberPage() {
               </Button>
             </div>
           </div>
-        ) : (
+        ) : typeView === "table" ? (
           <>
             <DataTable columns={columns} data={members?.data} />
             <div className="mt-5">
               <Paginate currentPage={currentPage} handlePageChange={handlePageChange} totalPages={members?.totalPage} visiblePage={3} />
             </div>
           </>
+        ) : (
+          <Hierarchy members={members} />
         )}
       </div>
     </AppWrapper>

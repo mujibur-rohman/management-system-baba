@@ -67,7 +67,7 @@ export class MemberController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Post('/:id')
+  @Post('/reset-password/:id')
   async resetPassword(
     @Param('id') id: string,
     @Body() body: { password: string },

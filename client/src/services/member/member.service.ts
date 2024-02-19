@@ -31,6 +31,14 @@ const MemberService = {
     }>(`${MEMBER_PATHNAME}/${id}`);
     return res.data;
   },
+  resetPassword: async (id: string, password: string) => {
+    const res = await axiosInitialize.post<{
+      message: string;
+    }>(`${MEMBER_PATHNAME}/reset-password/${id}`, {
+      password,
+    });
+    return res.data;
+  },
 };
 
 export default MemberService;
