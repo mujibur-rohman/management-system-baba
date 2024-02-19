@@ -16,6 +16,18 @@ import AddMember from "./_components/add-member";
 import { cn } from "@/lib/utils";
 import Hierarchy from "./_components/hierarchy";
 
+const getTotalDataCount = (data: any) => {
+  let totalCount = data?.length;
+
+  data?.forEach((node: any) => {
+    if (node.children) {
+      totalCount += getTotalDataCount(node.children);
+    }
+  });
+
+  return totalCount;
+};
+
 function MemberPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState<string>("");
@@ -45,8 +57,6 @@ function MemberPage() {
     setSearch(event.target.value);
   };
 
-  console.log(members);
-
   return (
     <AppWrapper className="pb-20">
       <div className="py-5 flex justify-between">
@@ -54,7 +64,11 @@ function MemberPage() {
         <AddMember />
       </div>
       <div className="my-3">
-        <span className="text-xl font-medium">Total Member : {members?.totalRows}</span>
+        {typeView === "table" ? (
+          <span className="text-xl font-medium">Total Member : {members?.totalRows}</span>
+        ) : (
+          <span className="text-xl font-medium">Total Member Global : {getTotalDataCount(members?.data)}</span>
+        )}
       </div>
       <div className="border rounded-lg p-5">
         <div

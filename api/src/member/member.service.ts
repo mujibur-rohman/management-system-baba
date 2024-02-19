@@ -8,6 +8,8 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class MemberService {
+  totalMemberGlobal = 0;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly authService: AuthService,
@@ -103,6 +105,7 @@ export class MemberService {
         totalRows: topLevelMembers.length,
         totalPage: 0,
         data: topLevelMembers,
+        haha: this.totalMemberGlobal,
       };
     } else {
       throw new BadRequestException('type must be hierarchy or table');
@@ -130,8 +133,11 @@ export class MemberService {
     }
 
     const nestedMembersPromises = members.map(async (member) => {
+      this.totalMemberGlobal = this.totalMemberGlobal + 1;
       const children = await this.fetchNestedMembers(member.id);
-      const tempData: any = member;
+      const tempData: any = {
+        ...member,
+      };
       if (children.length > 0) {
         tempData.children = children;
       }

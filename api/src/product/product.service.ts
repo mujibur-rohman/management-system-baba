@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
@@ -11,7 +15,48 @@ export class ProductService {
     private readonly authService: AuthService,
   ) {}
 
+  async updateStock({
+    productId,
+    stock,
+  }: {
+    productId: number;
+    stock: number;
+  }) {
+    const availableProduct = await this.prisma.product.findFirst({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!availableProduct) {
+      throw new NotFoundException('Produk tidak ditemukan');
+    }
+
+    await this.prisma.product.update({
+      where: {
+        id: availableProduct.id,
+      },
+      data: {
+        stock,
+      },
+    });
+
+    return {
+      message: `Stok berhasil diubah menjadi ${stock}`,
+    };
+  }
+
   async generateProduct(userData: User) {
+    const countProduct = await this.prisma.product.count({
+      where: {
+        userId: userData.id,
+      },
+    });
+
+    if (countProduct > 0) {
+      throw new BadRequestException('Anda sudah generate produk sebelumnya');
+    }
+
     const mappingGenerateBaru = PRODUCT_DATA.BARU.map(async (product) => {
       await this.prisma.product.create({
         data: {
@@ -42,19 +87,54 @@ export class ProductService {
     };
   }
 
-  async processGenerate(dataProduct: {
-    userId: string;
-    aroma: string;
-    name: string;
-    stock: number;
+  async getProducts({
+    limit,
+    page,
+    q,
+    type,
+    userData,
+  }: {
+    q: string;
+    page: number;
+    limit: number;
+    type: 'LAMA' | 'BARU';
+    userData: User;
   }) {
-    await this.prisma.product.create({
-      data: {
-        userId: parseInt(dataProduct.userId),
-        aroma: dataProduct.aroma,
-        name: dataProduct.name,
-        stock: dataProduct.stock,
+    const offset = limit * page - limit;
+
+    const totalRows = await this.prisma.product.count({
+      where: {
+        userId: userData.id,
+        name: {
+          contains: q,
+        },
+        aroma: type,
       },
     });
+
+    const totalPage = Math.ceil(totalRows / limit);
+
+    const products = await this.prisma.product.findMany({
+      where: {
+        userId: userData.id,
+        name: {
+          contains: q,
+        },
+        aroma: type,
+      },
+      skip: offset,
+      take: limit,
+      orderBy: {
+        name: 'asc',
+      },
+    });
+
+    return {
+      page,
+      limit,
+      totalRows,
+      totalPage,
+      data: products,
+    };
   }
 }
