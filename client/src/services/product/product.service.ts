@@ -15,6 +15,16 @@ const ProductService = {
     });
     return res.data;
   },
+  updateStock: async ({ id, stock }: { id: number; stock: number }) => {
+    const res = await axiosInitialize.put<{ message: string }>(`${PRODUCT_PATHNAME}/${id}/stock`, {
+      stock,
+    });
+    return res.data;
+  },
+  generate: async () => {
+    const res = await axiosInitialize.post<{ message: string }>(`${PRODUCT_PATHNAME}/generate`);
+    return res.data;
+  },
 };
 
 export default ProductService;

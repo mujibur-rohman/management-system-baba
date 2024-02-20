@@ -7,6 +7,7 @@ import { User } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 import PRODUCT_DATA from 'src/config/product-setting';
+import { AddToCartDto, ArrEditCartDto } from './dto/product.dto';
 
 @Injectable()
 export class ProductService {
@@ -129,12 +130,116 @@ export class ProductService {
       },
     });
 
+    // * count stock
+    const stockProduct = await this.prisma.product.findMany({
+      where: {
+        userId: userData.id,
+        stock: {
+          gt: 0,
+        },
+      },
+    });
+
+    const totalStock = stockProduct.reduce(
+      (total, product) => total + product.stock,
+      0,
+    );
+
     return {
       page: page * 1,
       limit: limit * 1,
       totalRows,
       totalPage,
+      totalStock,
       data: products,
     };
+  }
+
+  async addProductToCart({
+    cartDto,
+    userData,
+  }: {
+    cartDto: AddToCartDto;
+    userData: User;
+  }) {
+    const availableCart = await this.prisma.cart.findFirst({
+      where: {
+        productId: cartDto.productId,
+        userId: userData.id,
+      },
+    });
+
+    if (availableCart) {
+      throw new BadRequestException('Produk Sudah Ada Dipesanan');
+    }
+
+    await this.prisma.cart.create({
+      data: {
+        productId: cartDto.productId,
+        price: cartDto.price,
+        qty: cartDto.qty,
+        userId: userData.id,
+      },
+    });
+
+    return {
+      message: 'Berhasil masuk ke pesanan, coba liat!',
+    };
+  }
+
+  async deleteCart(cartId: number) {
+    await this.prisma.cart.delete({
+      where: {
+        id: cartId,
+      },
+    });
+
+    return {
+      message: 'Pesanan sudah di hapus ya!',
+    };
+  }
+
+  async editCart(cartDto: ArrEditCartDto) {
+    let errorData = 0;
+    const promises = cartDto.data.map(async (cart) => {
+      try {
+        const availableCart = await this.prisma.cart.findFirst({
+          where: {
+            id: cart.id,
+          },
+          include: {
+            product: true,
+          },
+        });
+
+        if (!availableCart) {
+          throw new NotFoundException('Ada pesanan yang tidak ditemukan');
+        }
+
+        await this.prisma.cart.update({
+          where: {
+            id: cart.id,
+          },
+          data: {
+            price: cart.price,
+            qty: cart.qty,
+          },
+        });
+      } catch (error) {
+        errorData++;
+      }
+    });
+
+    await Promise.all(promises);
+
+    if (errorData > 0) {
+      return {
+        message: `Udah di save ya!, ada ${errorData} data yang gagal`,
+      };
+    } else {
+      return {
+        message: 'Udah di save ya!',
+      };
+    }
   }
 }

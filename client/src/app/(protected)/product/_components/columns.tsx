@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import "moment/locale/id";
+import ActionCellProduct from "./action-cell";
 
 export const columns: ColumnDef<ProductTypes>[] = [
   {
@@ -30,11 +31,7 @@ export const columns: ColumnDef<ProductTypes>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      return (
-        <Button variant="warning" size="sm">
-          Perbarui
-        </Button>
-      );
+      return <ActionCellProduct id={row.original.id} stock={row.original.stock} />;
     },
   },
 ];

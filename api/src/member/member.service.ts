@@ -22,7 +22,6 @@ export class MemberService {
   }
 
   async registerMember(registerDto: RegisterDto, userData: User) {
-    console.log(userData);
     const { user } = await this.authService.register({
       name: registerDto.name,
       password: registerDto.password,

@@ -53,7 +53,6 @@ function AddMember() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log(values);
       const newMember = await MemberService.addMember(values);
       queryClient.invalidateQueries({ queryKey: ["member"] });
       toast.success(newMember.message);

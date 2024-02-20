@@ -19,24 +19,31 @@ function ActionCell({ id }: { id: string }) {
   };
 
   const handleConfirm = async () => {
-    setLoading(true);
-    switch (typeAction) {
-      case "delete":
-        const deleteResponse = await MemberService.deleteMember(id);
-        queryClient.invalidateQueries({ queryKey: ["member"] });
-        toast.success(deleteResponse.message);
-        setLoading(false);
-        setOpenDialog(false);
-        break;
-      case "reset":
-        const resetResponse = await MemberService.resetPassword(id, "babaparfum");
-        queryClient.invalidateQueries({ queryKey: ["member"] });
-        toast.success(resetResponse.message);
-        setLoading(false);
-        setOpenDialog(false);
-        break;
-      default:
-        break;
+    try {
+      setLoading(true);
+      switch (typeAction) {
+        case "delete":
+          const deleteResponse = await MemberService.deleteMember(id);
+          queryClient.invalidateQueries({ queryKey: ["member"] });
+          toast.success(deleteResponse.message);
+          break;
+        case "reset":
+          const resetResponse = await MemberService.resetPassword(id, "babaparfum");
+          queryClient.invalidateQueries({ queryKey: ["member"] });
+          toast.success(resetResponse.message);
+          break;
+        default:
+          break;
+      }
+    } catch (error: any) {
+      if (error?.response?.data) {
+        toast.error(error.response.data.message);
+        return;
+      }
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+      setOpenDialog(false);
     }
   };
 

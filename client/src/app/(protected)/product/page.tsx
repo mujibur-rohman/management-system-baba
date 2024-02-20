@@ -7,18 +7,22 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/useDebounce";
 import ProductService from "@/services/product/product.service";
-import { useQuery } from "@tanstack/react-query";
-import { RefreshCwIcon } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2Icon, RefreshCwIcon } from "lucide-react";
 import React, { ChangeEvent, useState } from "react";
 import { columns } from "./_components/columns";
 import Paginate from "@/components/paginate";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 function ProductPage() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingGenerate, setLoadingGenerate] = useState(false);
   const [search, setSearch] = useState<string>("");
   const [typeView, setTypeView] = useState<string>("baru");
   const debouncedValue = useDebounce<string>(search, 300);
+
+  const queryClient = useQueryClient();
 
   const {
     data: products,
@@ -44,14 +48,31 @@ function ProductPage() {
     setCurrentPage(1);
   };
 
-  console.log(products);
+  //* generate process
+  const generate = async () => {
+    try {
+      setLoadingGenerate(true);
+      const res = await ProductService.generate();
+      queryClient.invalidateQueries({ queryKey: ["product"] });
+      toast.success(res.message);
+    } catch (error: any) {
+      if (error?.response?.data) {
+        toast.error(error.response.data.message);
+        return;
+      }
+      toast.error(error.message);
+    } finally {
+      setLoadingGenerate(false);
+    }
+  };
+
   return (
     <AppWrapper className="pb-20">
       <div className="py-5 flex justify-between">
         <h1 className="text-xl md:text-2xl font-bold">Produk & Stok</h1>
       </div>
       <div className="my-3">
-        <span className="text-xl font-medium">Total Semua Stok : 102</span>
+        <span className="text-xl font-medium">Total Semua Stok : {products?.totalStock}</span>
       </div>
       <div className="border rounded-lg p-5">
         <div className="flex flex-col md:flex-row gap-3 mb-4 justify-between">
@@ -97,6 +118,15 @@ function ProductPage() {
               <p>Terjadi kesalahan</p>
               <Button size="sm" onClick={() => refetch()}>
                 <RefreshCwIcon />
+              </Button>
+            </div>
+          </div>
+        ) : products?.totalRows === 0 ? (
+          <div className="flex justify-center">
+            <div className="text-center space-y-2">
+              <p>Produk belum di generate, silahkan generate terlebih dahulu</p>
+              <Button disabled={isLoadingGenerate} variant="destructive" onClick={generate}>
+                {isLoadingGenerate ? <Loader2Icon className="animate-spin" /> : "Generate"}
               </Button>
             </div>
           </div>

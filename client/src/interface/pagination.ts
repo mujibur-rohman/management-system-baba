@@ -3,5 +3,6 @@ export interface PaginationInterface<T> {
   limit: number;
   totalRows: number;
   totalPage: number;
+  totalStock?: number;
   data: T[];
 }
