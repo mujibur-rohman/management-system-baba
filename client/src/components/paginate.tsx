@@ -19,7 +19,7 @@ const Paginate = ({
     for (let i = startPage; i <= Math.min(totalPages, startPage + visiblePage - 1); i++) {
       pages.push(
         <PaginationItem key={i}>
-          <PaginationLink onClick={() => handlePageChange(i)} isActive={currentPage === i}>
+          <PaginationLink className="cursor-pointer" onClick={() => handlePageChange(i)} isActive={currentPage === i}>
             {i}
           </PaginationLink>
         </PaginationItem>

@@ -123,15 +123,15 @@ export class ProductService {
         aroma: type,
       },
       skip: offset,
-      take: limit,
+      take: limit * 1,
       orderBy: {
         name: 'asc',
       },
     });
 
     return {
-      page,
-      limit,
+      page: page * 1,
+      limit: limit * 1,
       totalRows,
       totalPage,
       data: products,
