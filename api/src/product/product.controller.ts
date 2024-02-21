@@ -32,6 +32,16 @@ export class ProductController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @Get('/cart')
+  async getCarts(@Req() request: Request) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    return this.productService.getCart(request.user as User);
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Post('/cart')
   async addToCart(@Req() request: Request, @Body() cartDto: AddToCartDto) {
     if (!request.user) {
@@ -57,7 +67,6 @@ export class ProductController {
   @UseGuards(AccessTokenGuard)
   @Delete('/cart/delete/:id')
   async deleteCart(@Param('id') id: string) {
-    console.log(id);
     return await this.productService.deleteCart(parseInt(id));
   }
 
@@ -81,7 +90,6 @@ export class ProductController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('q') q: string = '',
-    @Query('type') type: 'BARU' | 'LAMA' = 'BARU',
   ) {
     if (!request.user) {
       throw new UnauthorizedException();
@@ -90,8 +98,37 @@ export class ProductController {
       limit,
       page,
       q,
-      type,
       userData: request.user as User,
     });
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('/parent')
+  async getProductParent(
+    @Req() request: Request,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('q') q: string = '',
+  ) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    const userData = request.user as User;
+    if (userData.parentId) {
+      return await this.productService.getProductsParent({
+        limit,
+        page,
+        q,
+        userData: request.user as User,
+      });
+    } else {
+      return await this.productService.getProducts({
+        limit,
+        page,
+        q,
+        userData: request.user as User,
+      });
+    }
   }
 }

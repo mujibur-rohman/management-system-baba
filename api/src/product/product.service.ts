@@ -58,30 +58,18 @@ export class ProductService {
       throw new BadRequestException('Anda sudah generate produk sebelumnya');
     }
 
-    const mappingGenerateBaru = PRODUCT_DATA.BARU.map(async (product) => {
+    const mappingGenerate = PRODUCT_DATA.map(async (product) => {
       await this.prisma.product.create({
         data: {
           userId: userData.id,
-          aroma: 'BARU',
-          name: product,
+          aromaLama: product[0],
+          aromaBaru: product[1],
           stock: 0,
         },
       });
     });
 
-    const mappingGenerateLama = PRODUCT_DATA.LAMA.map(async (product) => {
-      await this.prisma.product.create({
-        data: {
-          userId: userData.id,
-          aroma: 'LAMA',
-          name: product,
-          stock: 0,
-        },
-      });
-    });
-
-    await Promise.all(mappingGenerateBaru);
-    await Promise.all(mappingGenerateLama);
+    await Promise.all(mappingGenerate);
 
     return {
       message: 'Data berhasil digenerate',
@@ -92,13 +80,11 @@ export class ProductService {
     limit,
     page,
     q,
-    type,
     userData,
   }: {
     q: string;
     page: number;
     limit: number;
-    type: 'LAMA' | 'BARU';
     userData: User;
   }) {
     const offset = limit * page - limit;
@@ -106,10 +92,18 @@ export class ProductService {
     const totalRows = await this.prisma.product.count({
       where: {
         userId: userData.id,
-        name: {
-          contains: q,
-        },
-        aroma: type,
+        OR: [
+          {
+            aromaBaru: {
+              contains: q,
+            },
+          },
+          {
+            aromaLama: {
+              contains: q,
+            },
+          },
+        ],
       },
     });
 
@@ -118,15 +112,26 @@ export class ProductService {
     const products = await this.prisma.product.findMany({
       where: {
         userId: userData.id,
-        name: {
-          contains: q,
-        },
-        aroma: type,
+        OR: [
+          {
+            aromaBaru: {
+              contains: q,
+            },
+          },
+          {
+            aromaLama: {
+              contains: q,
+            },
+          },
+        ],
       },
       skip: offset,
       take: limit * 1,
       orderBy: {
-        name: 'asc',
+        aromaLama: 'asc',
+      },
+      include: {
+        cart: true,
       },
     });
 
@@ -151,6 +156,80 @@ export class ProductService {
       totalRows,
       totalPage,
       totalStock,
+      data: products,
+    };
+  }
+
+  async getProductsParent({
+    limit,
+    page,
+    q,
+    userData,
+  }: {
+    q: string;
+    page: number;
+    limit: number;
+    userData: User;
+  }) {
+    const offset = limit * page - limit;
+
+    const totalRows = await this.prisma.product.count({
+      where: {
+        userId: userData.parentId,
+        OR: [
+          {
+            aromaBaru: {
+              contains: q,
+            },
+          },
+          {
+            aromaLama: {
+              contains: q,
+            },
+          },
+        ],
+        stock: {
+          gt: 0,
+        },
+      },
+    });
+
+    const totalPage = Math.ceil(totalRows / limit);
+
+    const products = await this.prisma.product.findMany({
+      where: {
+        userId: userData.parentId,
+        OR: [
+          {
+            aromaBaru: {
+              contains: q,
+            },
+          },
+          {
+            aromaLama: {
+              contains: q,
+            },
+          },
+        ],
+        stock: {
+          gt: 0,
+        },
+      },
+      skip: offset,
+      take: limit * 1,
+      orderBy: {
+        aromaLama: 'asc',
+      },
+      include: {
+        cart: true,
+      },
+    });
+
+    return {
+      page: page * 1,
+      limit: limit * 1,
+      totalRows,
+      totalPage,
       data: products,
     };
   }
@@ -241,5 +320,17 @@ export class ProductService {
         message: 'Udah di save ya!',
       };
     }
+  }
+
+  async getCart(userData: User) {
+    const carts = await this.prisma.cart.findMany({
+      where: {
+        userId: userData.id,
+      },
+    });
+
+    return {
+      data: carts,
+    };
   }
 }

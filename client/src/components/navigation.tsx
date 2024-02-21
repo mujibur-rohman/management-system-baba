@@ -1,6 +1,6 @@
 "use client";
 
-import { HomeIcon, MoreHorizontalIcon, Package2Icon, User2Icon } from "lucide-react";
+import { ArchiveRestoreIcon, HomeIcon, MoreHorizontalIcon, Package2Icon, PackageIcon, ShoppingCartIcon, User2Icon, WalletIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 function Navigation() {
   const pathname = usePathname();
   return (
-    <div className="fixed grid grid-cols-4 bottom-0 right-0 left-0 bg-background border-border border p-2 rounded-t-lg">
+    <div className="fixed grid grid-cols-4 gap-3 bottom-0 right-0 left-0 bg-background border-border border p-2 rounded-t-lg">
       <Link
         href="/"
         className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
@@ -55,22 +55,22 @@ function Navigation() {
 
 function MenuItem() {
   return (
-    <div className="grid grid-cols-4 py-5">
-      <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
-        <HomeIcon />
-        <span className="text-xs">Dashboard</span>
+    <div className="grid grid-cols-4 gap-3 py-2 m-3">
+      <Link href="/order" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
+        <ShoppingCartIcon />
+        <span className="text-xs">Order</span>
       </Link>
       <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
-        <Package2Icon />
-        <span className="text-xs">Produk</span>
+        <ArchiveRestoreIcon />
+        <span className="text-xs">Orderan Tim</span>
       </Link>
       <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
-        <User2Icon />
-        <span className="text-xs">Member</span>
+        <PackageIcon />
+        <span className="text-xs">Orderan Saya</span>
       </Link>
       <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
-        <User2Icon />
-        <span className="text-xs">Member</span>
+        <WalletIcon />
+        <span className="text-xs">Keuangan</span>
       </Link>
       <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
         <HomeIcon />

@@ -4,15 +4,28 @@ import { PaginationInterface } from "@/interface/pagination";
 const PRODUCT_PATHNAME = "/product";
 
 const ProductService = {
-  getAll: async ({ limit = 10, page = 1, q = "", type = "baru" }: { limit?: number; page: number; q: string; type: string }) => {
+  getAll: async ({ limit = 10, page = 1, q = "" }: { limit?: number; page: number; q: string }) => {
     const res = await axiosInitialize.get<PaginationInterface<ProductTypes>>(PRODUCT_PATHNAME, {
       params: {
         limit,
         page,
         q,
-        type,
       },
     });
+    return res.data;
+  },
+  getAllParent: async ({ limit = 10, page = 1, q = "" }: { limit?: number; page: number; q: string }) => {
+    const res = await axiosInitialize.get<PaginationInterface<ProductTypes>>(`${PRODUCT_PATHNAME}/parent`, {
+      params: {
+        limit,
+        page,
+        q,
+      },
+    });
+    return res.data;
+  },
+  addToCart: async (payload: { qty: number; productId: number; price: string }) => {
+    const res = await axiosInitialize.post<{ message: string }>(`${PRODUCT_PATHNAME}/cart`, payload);
     return res.data;
   },
   updateStock: async ({ id, stock }: { id: number; stock: number }) => {
@@ -23,6 +36,10 @@ const ProductService = {
   },
   generate: async () => {
     const res = await axiosInitialize.post<{ message: string }>(`${PRODUCT_PATHNAME}/generate`);
+    return res.data;
+  },
+  getCarts: async () => {
+    const res = await axiosInitialize.get<{ data: Cart[] }>(`${PRODUCT_PATHNAME}/cart`);
     return res.data;
   },
 };

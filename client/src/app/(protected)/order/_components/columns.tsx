@@ -30,7 +30,7 @@ export const columns: ColumnDef<ProductTypes>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      return <ActionCellProduct id={row.original.id} stock={row.original.stock} />;
+      return <ActionCellProduct id={row.original.id} cart={row.original.cart} />;
     },
   },
 ];

@@ -1,6 +1,12 @@
 type ProductTypes = {
   id: number;
-  name: string;
-  aroma: string;
+  aromaLama: string;
+  aromaBaru: string;
   stock: number;
+  cart?: {
+    stock: number;
+    qty: number;
+    price: string;
+    userId: number;
+  }[];
 };

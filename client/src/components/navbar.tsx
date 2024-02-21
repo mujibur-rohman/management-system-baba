@@ -5,18 +5,26 @@ import styles from "@/components/styles.module.scss";
 import AppWrapper from "@/components/app-wrapper";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { LogOutIcon, User2Icon } from "lucide-react";
+import { LogOutIcon, ShoppingCartIcon, User2Icon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AuthService from "@/services/auth/auth.service";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import ProductService from "@/services/product/product.service";
+import { useQuery } from "@tanstack/react-query";
 
 function Navbar() {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const session = useAuth();
-  const pathname = usePathname();
+
+  const { data: carts } = useQuery({
+    queryKey: ["cart"],
+    queryFn: async () => {
+      return await ProductService.getCarts();
+    },
+  });
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
@@ -30,6 +38,10 @@ function Navbar() {
             BABA
           </Link>
           <div className="flex gap-4 items-center">
+            <Link href="/carts" className="relative cursor-pointer">
+              <div className="w-4 h-4 flex -top-1 -left-1 justify-center items-center rounded-lg absolute bg-blue-500 text-white p-1 text-[10px]">{carts?.data.length}</div>
+              <ShoppingCartIcon />
+            </Link>
             <input
               id="toggle"
               className={styles.toggle}
