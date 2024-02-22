@@ -28,10 +28,12 @@ model User {
   role         String    
   token        String?    @db.LongText()
   joinDate     DateTime   @db.Date()
-  parentId     Int?
+  parentId      Int?
+  leaderSignedId     Int?
   profile      UserProfile?
   product      Product[]
   cart         Cart[]
+  order        Order[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -60,4 +62,16 @@ model Cart {
    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
    product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
    productId      Int      
+}
+
+model Order {
+  id              Int      @id @default(autoincrement()) @map("_id")
+  noOrder         String
+  orderDate       DateTime   @db.Date()
+  method          String
+  totalPrice      String
+  amountPaid      String
+  remainingAmount String
+  userId          Int   
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

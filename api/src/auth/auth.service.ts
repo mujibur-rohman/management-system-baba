@@ -25,7 +25,15 @@ export class AuthService {
     private readonly emailService: EmailService,
   ) {}
   async register(registerDto: RegisterDto) {
-    const { name, password, idMember, parentId, joinDate, role } = registerDto;
+    const {
+      name,
+      password,
+      idMember,
+      parentId,
+      joinDate,
+      role,
+      leaderSignedId,
+    } = registerDto;
 
     const isIdExist = await this.prisma.user.findUnique({
       where: {
@@ -47,6 +55,7 @@ export class AuthService {
         role: role ? role : STATUS_MEMBER[0].name,
         parentId,
         joinDate: new Date(joinDate),
+        leaderSignedId,
       },
       select: {
         name: true,

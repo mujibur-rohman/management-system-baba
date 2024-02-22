@@ -22,16 +22,64 @@ export class MemberService {
   }
 
   async registerMember(registerDto: RegisterDto, userData: User) {
+    // * funsi rekursif
+    const findUltimateParent = async (
+      userId: number,
+    ): Promise<number | null> => {
+      const user = await this.prisma.user.findFirst({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!user) {
+        return null;
+      }
+
+      if (!user.parentId) {
+        return user.id;
+      }
+
+      return findUltimateParent(user.parentId);
+    };
+
+    const myRole = STATUS_MEMBER.find((s) => s.name === userData.role);
+    const memberRole = STATUS_MEMBER.find((s) => s.name === registerDto.role);
+
+    const topRole = STATUS_MEMBER[0];
+
+    // ** menentukan leaderSigned
+
+    // * mencegah daftar untuk top role
+
+    if (topRole.name === registerDto.role) {
+      throw new BadRequestException(
+        `tidak bisa mendaftarkan ${registerDto.role}`,
+      );
+    }
+
+    // * jika menambah role yang levelnya sama, maka parentnya ke leader
+    let parentId: number | null = null;
+    if (myRole.id === memberRole.id) {
+      parentId = userData.parentId;
+    } else if (myRole.id > memberRole.id && userData.parentId) {
+      // * rekursif akan mencari leader teratas jika user mendaftarkan diatas rolenya
+      parentId = await findUltimateParent(userData.parentId);
+    } else {
+      parentId = userData.id;
+    }
+
     const { user } = await this.authService.register({
       name: registerDto.name,
       password: registerDto.password,
       idMember: registerDto.idMember,
       email: null,
-      parentId: userData.id || null,
+      parentId: parentId || null,
       role: registerDto.role
         ? registerDto.role
         : this.getStatusMemberBellow(userData.role).name,
       joinDate: new Date(),
+      leaderSignedId: userData.id,
     });
     return {
       data: user,

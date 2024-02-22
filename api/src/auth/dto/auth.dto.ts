@@ -31,6 +31,9 @@ export class RegisterDto {
   parentId: number;
 
   @IsOptional()
+  leaderSignedId: number;
+
+  @IsOptional()
   @IsIn(STATUS_MEMBER.map((s) => s.name))
   role: string;
 }

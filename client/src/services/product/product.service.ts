@@ -42,6 +42,20 @@ const ProductService = {
     const res = await axiosInitialize.get<{ data: Cart[] }>(`${PRODUCT_PATHNAME}/cart`);
     return res.data;
   },
+  deleteCart: async (cartId: number) => {
+    const res = await axiosInitialize.delete<{ message: string }>(`${PRODUCT_PATHNAME}/cart/delete/${cartId}`);
+    return res.data;
+  },
+  updateCart: async (payload: {
+    data: {
+      id: number;
+      qty: number;
+      price: string;
+    }[];
+  }) => {
+    const res = await axiosInitialize.put<{ message: string }>(`${PRODUCT_PATHNAME}/cart/update`, payload);
+    return res.data;
+  },
 };
 
 export default ProductService;

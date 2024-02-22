@@ -164,11 +164,13 @@ function AddMember() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.values(STATUS_MEMBER).map((status) => (
-                        <SelectItem key={status} value={status} className="capitalize">
-                          {status}
-                        </SelectItem>
-                      ))}
+                      {Object.values(STATUS_MEMBER)
+                        .filter((s) => s !== STATUS_MEMBER.SUPPLIER)
+                        .map((status) => (
+                          <SelectItem key={status} value={status} className="capitalize">
+                            {status}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

@@ -10,3 +10,4 @@ type ProductTypes = {
     userId: number;
   }[];
 };
+''

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 function Navigation() {
   const pathname = usePathname();
+  if (pathname === "/carts") return null;
   return (
     <div className="fixed grid grid-cols-4 gap-3 bottom-0 right-0 left-0 bg-background border-border border p-2 rounded-t-lg">
       <Link

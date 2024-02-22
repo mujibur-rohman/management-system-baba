@@ -40,6 +40,7 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.7",
     "passport-jwt": "^4.0.1",
+    "random-string-alphanumeric-generator": "^0.12.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "uuid": "^9.0.1"

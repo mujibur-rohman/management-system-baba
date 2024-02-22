@@ -327,6 +327,9 @@ export class ProductService {
       where: {
         userId: userData.id,
       },
+      include: {
+        product: true,
+      },
     });
 
     return {
