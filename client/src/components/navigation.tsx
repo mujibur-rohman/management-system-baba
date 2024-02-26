@@ -87,7 +87,12 @@ function MenuItem({ pathname }: { pathname: string }) {
         <HomeIcon />
         <span className="text-xs">Dashboard</span>
       </Link>
-      <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
+      <Link
+        href="/product"
+        className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
+          "bg-blue-500 text-white": pathname === "/product",
+        })}
+      >
         <Package2Icon />
         <span className="text-xs">Produk</span>
       </Link>

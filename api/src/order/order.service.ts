@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
-import { CreateOrderDto, EditOrderDto } from './dto/order.dto';
+import { ConfirmOrderDto, CreateOrderDto, EditOrderDto } from './dto/order.dto';
 import { ProductService } from 'src/product/product.service';
 import { User } from '@prisma/client';
 
@@ -132,5 +132,105 @@ export class OrderService {
       totalPage,
       data: orders,
     };
+  }
+
+  async confirmOrder({
+    id,
+    userData,
+    confimOrderDto,
+  }: {
+    id: number;
+    userData: User;
+    confimOrderDto: ConfirmOrderDto;
+  }) {
+    const order = await this.prisma.order.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!order) {
+      throw new BadRequestException('order not found');
+    }
+
+    if (order.isConfirm) {
+      throw new BadRequestException('order sudah terkonfirmasi');
+    }
+
+    if (userData.parentId) {
+      return {
+        message: 'cek stok dulu',
+      };
+    }
+
+    console.log(confimOrderDto.cart);
+
+    await this.prisma.order.update({
+      where: {
+        id: order.id,
+      },
+      data: {
+        isConfirm: true,
+      },
+    });
+
+    // * update stok user
+    let errorData = 0;
+    const promises = confimOrderDto.cart.map(async (cart) => {
+      try {
+        const availableProduct = await this.prisma.product.findFirst({
+          where: {
+            id: cart.productId,
+          },
+        });
+
+        if (!availableProduct) {
+          throw new NotFoundException('Ada produk yang tidak ditemukan');
+        }
+
+        await this.prisma.product.update({
+          where: {
+            id: availableProduct.id,
+          },
+          data: {
+            stock: availableProduct.stock + cart.qty,
+          },
+        });
+      } catch (error) {
+        errorData++;
+      }
+    });
+
+    await Promise.all(promises);
+
+    if (errorData > 0) {
+      return {
+        message: `Orderan berhasil dikonfirmasi!, ada ${errorData} produk yang gagal`,
+      };
+    } else {
+      return {
+        message: 'Orderan berhasil dikonfirmasi',
+      };
+    }
+  }
+
+  async deleteOrder(id: number) {
+    const order = await this.prisma.order.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!order) {
+      throw new BadRequestException('order not found');
+    }
+
+    await this.prisma.order.delete({
+      where: {
+        id: order.id,
+      },
+    });
+
+    return { message: `Order berhasil dihapus` };
   }
 }

@@ -1,3 +1,4 @@
+import { Cart } from '@prisma/client';
 import { IsNotEmpty } from 'class-validator';
 
 export class CreateOrderDto {
@@ -23,4 +24,9 @@ export class EditOrderDto {
 
   @IsNotEmpty({ message: 'Cart is required.' })
   cart: object;
+}
+
+export class ConfirmOrderDto {
+  @IsNotEmpty({ message: 'Cart is required.' })
+  cart: Cart[];
 }

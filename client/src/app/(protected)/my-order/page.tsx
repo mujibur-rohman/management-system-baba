@@ -73,7 +73,7 @@ function MyOrder() {
         ) : orders?.totalRows === 0 ? (
           <div className="flex justify-center">
             <div className="text-center space-y-2">
-              <p>Stok Sedang Kosong</p>
+              <p>Tidak ada orderan</p>
             </div>
           </div>
         ) : (

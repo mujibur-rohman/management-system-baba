@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -12,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { AccessTokenGuard } from 'src/guards/access-token.guard';
-import { CreateOrderDto, EditOrderDto } from './dto/order.dto';
+import { ConfirmOrderDto, CreateOrderDto, EditOrderDto } from './dto/order.dto';
 import { Request } from 'express';
 import { User } from '@prisma/client';
 
@@ -69,5 +70,30 @@ export class OrderController {
       userData: request as any,
       q,
     });
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('/confirm/:id')
+  async comfirmOrder(
+    @Req() request: Request,
+    @Param('id') idOrder: string,
+    @Body() confimOrderDto: ConfirmOrderDto,
+  ) {
+    console.log(idOrder);
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.orderService.confirmOrder({
+      userData: request as any,
+      confimOrderDto,
+      id: parseInt(idOrder),
+    });
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete('/:id')
+  async deleteOrder(@Param('id') idOrder: string) {
+    return await this.orderService.deleteOrder(parseInt(idOrder));
   }
 }

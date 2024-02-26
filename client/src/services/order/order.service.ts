@@ -27,6 +27,18 @@ const OrderService = {
     }>(`${ORDER_PATHNAME}/${id}`, payload);
     return res.data;
   },
+  confirmOrder: async ({ id, payload }: { id: number; payload: any }) => {
+    const res = await axiosInitialize.post<{
+      message: string;
+    }>(`${ORDER_PATHNAME}/confirm/${id}`, payload);
+    return res.data;
+  },
+  deleteOrder: async (id: number) => {
+    const res = await axiosInitialize.delete<{
+      message: string;
+    }>(`${ORDER_PATHNAME}/${id}`);
+    return res.data;
+  },
 };
 
 export default OrderService;

@@ -22,7 +22,6 @@ export const columns: ColumnDef<OrderTypes>[] = [
       const totalQty = jsonCart.reduce((accumulator, currentValue) => {
         return accumulator + currentValue.qty * 1;
       }, 0);
-      console.log(totalQty);
       return totalQty;
     },
   },
