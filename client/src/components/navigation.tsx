@@ -47,17 +47,22 @@ function Navigation() {
           </div>
         </DrawerTrigger>
         <DrawerContent>
-          <MenuItem />
+          <MenuItem pathname={pathname} />
         </DrawerContent>
       </Drawer>
     </div>
   );
 }
 
-function MenuItem() {
+function MenuItem({ pathname }: { pathname: string }) {
   return (
     <div className="grid grid-cols-4 gap-3 py-2 m-3">
-      <Link href="/order" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
+      <Link
+        href="/order"
+        className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
+          "bg-blue-500 text-white": pathname === "/order",
+        })}
+      >
         <ShoppingCartIcon />
         <span className="text-xs">Order</span>
       </Link>
@@ -65,7 +70,12 @@ function MenuItem() {
         <ArchiveRestoreIcon />
         <span className="text-xs">Orderan Tim</span>
       </Link>
-      <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
+      <Link
+        href="/my-order"
+        className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
+          "bg-blue-500 text-white": pathname === "/my-order",
+        })}
+      >
         <PackageIcon />
         <span className="text-xs">Orderan Saya</span>
       </Link>

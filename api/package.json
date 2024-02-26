@@ -32,6 +32,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/ejs": "^3.1.5",
     "@types/jsonwebtoken": "^9.0.5",
+    "@types/randomstring": "^1.1.11",
     "@types/uuid": "^9.0.7",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
@@ -41,6 +42,7 @@
     "nodemailer": "^6.9.7",
     "passport-jwt": "^4.0.1",
     "random-string-alphanumeric-generator": "^0.12.2",
+    "randomstring": "^1.3.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "uuid": "^9.0.1"

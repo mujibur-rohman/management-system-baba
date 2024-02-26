@@ -61,17 +61,20 @@ model Cart {
    userId         Int   
    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
    product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-   productId      Int      
+   productId      Int     
 }
 
 model Order {
   id              Int      @id @default(autoincrement()) @map("_id")
   noOrder         String
-  orderDate       DateTime   @db.Date()
-  method          String
+  orderDate       DateTime @default(now())
+  isConfirm       Boolean
   totalPrice      String
-  amountPaid      String
+  amountTrf       String
+  amountCash      String
   remainingAmount String
+  sellerId        Int?
+  cartData        String @db.LongText()  
   userId          Int   
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

@@ -15,6 +15,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { ProductModule } from './product/product.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ProductModule } from './product/product.module';
     AuthModule,
     MemberModule,
     ProductModule,
+    OrderModule,
   ],
   controllers: [AppController, MemberController],
   providers: [
