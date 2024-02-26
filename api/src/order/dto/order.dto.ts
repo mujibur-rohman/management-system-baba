@@ -13,3 +13,14 @@ export class CreateOrderDto {
   @IsNotEmpty({ message: 'Remaining amount is required.' })
   remainingAmount: string;
 }
+
+export class EditOrderDto {
+  @IsNotEmpty({ message: 'Total price is required.' })
+  totalPrice: string;
+
+  @IsNotEmpty({ message: 'Remaining amount is required.' })
+  remainingAmount: string;
+
+  @IsNotEmpty({ message: 'Cart is required.' })
+  cart: object;
+}

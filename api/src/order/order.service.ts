@@ -1,7 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
-import { CreateOrderDto } from './dto/order.dto';
+import { CreateOrderDto, EditOrderDto } from './dto/order.dto';
 import { ProductService } from 'src/product/product.service';
 import { User } from '@prisma/client';
 
@@ -52,7 +56,34 @@ export class OrderService {
 
     return {
       data: newOrder,
-      message: 'order has created!',
+      message: 'Order sudah masuk!',
+    };
+  }
+
+  async updateOrder(idOrder: number, editOrder: EditOrderDto) {
+    const availableOrder = await this.prisma.order.findFirst({
+      where: {
+        id: idOrder,
+      },
+    });
+
+    if (!availableOrder) {
+      throw new NotFoundException('Orderan tidak ditemukan');
+    }
+
+    await this.prisma.order.update({
+      where: {
+        id: availableOrder.id,
+      },
+      data: {
+        totalPrice: editOrder.totalPrice,
+        remainingAmount: editOrder.remainingAmount,
+        cartData: JSON.stringify(editOrder.cart, null, 2),
+      },
+    });
+
+    return {
+      message: 'Pesanan berhasil di ubah!',
     };
   }
 
@@ -60,16 +91,21 @@ export class OrderService {
     limit,
     page,
     userData,
+    q,
   }: {
     page: number;
     limit: number;
     userData: User;
+    q: string;
   }) {
     const offset = limit * page - limit;
 
     const totalRows = await this.prisma.order.count({
       where: {
         userId: userData.id,
+        noOrder: {
+          contains: q,
+        },
       },
     });
 
@@ -78,6 +114,9 @@ export class OrderService {
     const orders = await this.prisma.order.findMany({
       where: {
         userId: userData.id,
+        noOrder: {
+          contains: q,
+        },
       },
       skip: offset,
       take: limit,

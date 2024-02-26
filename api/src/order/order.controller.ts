@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
+  Put,
   Query,
   Req,
   UnauthorizedException,
@@ -10,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { AccessTokenGuard } from 'src/guards/access-token.guard';
-import { CreateOrderDto } from './dto/order.dto';
+import { CreateOrderDto, EditOrderDto } from './dto/order.dto';
 import { Request } from 'express';
 import { User } from '@prisma/client';
 
@@ -36,11 +38,26 @@ export class OrderController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @Put('/:id')
+  async updateOrder(
+    @Body() editOrderDto: EditOrderDto,
+    @Param('id') idOrder: string,
+  ) {
+    const result = await this.orderService.updateOrder(
+      parseInt(idOrder),
+      editOrderDto,
+    );
+
+    return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Get('/')
   async getOrders(
     @Req() request: Request,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('q') q: string = '',
   ) {
     if (!request.user) {
       throw new UnauthorizedException();
@@ -50,6 +67,7 @@ export class OrderController {
       limit: limit * 1,
       page: page * 1,
       userData: request as any,
+      q,
     });
   }
 }

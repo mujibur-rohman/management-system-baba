@@ -3,6 +3,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import "moment/locale/id";
 import { json } from "stream/consumers";
+import ActionCellMyOrder from "./action-cell";
+import { Badge } from "@/components/ui/badge";
 
 export const columns: ColumnDef<OrderTypes>[] = [
   {
@@ -18,10 +20,17 @@ export const columns: ColumnDef<OrderTypes>[] = [
     cell: ({ row }) => {
       const jsonCart: Cart[] = JSON.parse(row.original.cartData);
       const totalQty = jsonCart.reduce((accumulator, currentValue) => {
-        return accumulator + currentValue.qty;
+        return accumulator + currentValue.qty * 1;
       }, 0);
-
+      console.log(totalQty);
       return totalQty;
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Dikonfirmasi",
+    cell: ({ row }) => {
+      return <Badge variant={row.original.isConfirm ? "success" : "destructive"}>{row.original.isConfirm ? "Ya" : "Belum"}</Badge>;
     },
   },
   {
@@ -45,11 +54,18 @@ export const columns: ColumnDef<OrderTypes>[] = [
       return row.original.amountCash;
     },
   },
-  //   {
-  //     id: "actions",
-  //     enableHiding: false,
-  //     cell: ({ row }) => {
-  //       return <ActionCellProduct id={row.original.id} cart={row.original.cart} />;
-  //     },
-  //   },
+  {
+    accessorKey: "remainingAmount",
+    header: "Hutang",
+    cell: ({ row }) => {
+      return row.original.remainingAmount;
+    },
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      return <ActionCellMyOrder order={row.original} />;
+    },
+  },
 ];

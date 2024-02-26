@@ -25,9 +25,9 @@ function MyOrder() {
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: ["my-order", currentPage],
+    queryKey: ["my-order", currentPage, debouncedValue],
     queryFn: async () => {
-      return await OrderService.getOrders({ limit: 10, page: currentPage });
+      return await OrderService.getOrders({ limit: 10, page: currentPage, q: debouncedValue });
     },
   });
 
@@ -45,7 +45,7 @@ function MyOrder() {
   return (
     <AppWrapper className="pb-20">
       <div className="py-5 flex justify-between">
-        <h1 className="text-xl md:text-2xl font-bold">Stok Yang Tersedia</h1>
+        <h1 className="text-xl md:text-2xl font-bold">Pesanan Saya</h1>
       </div>
       <div className="border rounded-lg p-5">
         <div className="flex flex-col md:flex-row gap-3 mb-4 justify-between">

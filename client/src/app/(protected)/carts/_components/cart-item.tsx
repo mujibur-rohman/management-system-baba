@@ -3,7 +3,7 @@ import ProductService from "@/services/product/product.service";
 import { useQueryClient } from "@tanstack/react-query";
 import { TrashIcon } from "lucide-react";
 import React, { useState } from "react";
-import { UseFieldArrayRemove } from "react-hook-form";
+import { FieldArrayWithId, UseFieldArrayRemove } from "react-hook-form";
 import { toast } from "sonner";
 
 function CartItem({
@@ -12,14 +12,22 @@ function CartItem({
   updateQty,
   i,
   remove,
+  isClient = false,
 }: {
-  cart: Cart;
-  updateQty: (index: number, newValue: string) => void;
+  cart: FieldArrayWithId<
+    {
+      carts: Cart[];
+    },
+    "carts",
+    "_id"
+  >;
+  updateQty: (key: string, newValue: string) => void;
   quantities: {
-    [key: number]: any;
+    [key: string]: any;
   };
   i: number;
   remove: UseFieldArrayRemove;
+  isClient?: boolean;
 }) {
   const [isLoadingDel, setIsLoadingDel] = useState(false);
 
@@ -28,10 +36,13 @@ function CartItem({
   const handleDelete = async (id: number) => {
     try {
       setIsLoadingDel(true);
-      console.log(id);
-      const res = await ProductService.deleteCart(id);
-      toast.success(res.message);
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      if (!isClient) {
+        const res = await ProductService.deleteCart(id);
+        toast.success(res.message);
+        queryClient.invalidateQueries({ queryKey: ["cart"] });
+      } else {
+        delete quantities[cart._id];
+      }
     } catch (error: any) {
       if (error?.response?.data) {
         toast.error(error.response.data.message);
@@ -51,27 +62,27 @@ function CartItem({
         </span>
         <div className="flex gap-4 self-start">
           <div
-            onClick={() => updateQty(i, (parseInt(quantities[i]) - 1).toString())}
+            onClick={() => updateQty(cart._id, (parseInt(quantities[cart._id]) - 1).toString())}
             className="bg-foreground text-background cursor-pointer hover:bg-foreground/60 w-7 text-center rounded font-bold"
           >
             -
           </div>
           <input
             className="bg-transparent w-12 outline-none text-center"
-            value={quantities[i]}
+            value={quantities[cart._id]}
             onChange={(e) => {
               if (/^[0-9]*$/.test(e.target.value)) {
                 if (!e.target.value) {
-                  updateQty(i, "0");
+                  updateQty(cart._id, "0");
                   return;
                 }
                 const trimmedValue = e.target.value.replace(/^0+/, "");
-                updateQty(i, trimmedValue);
+                updateQty(cart._id, trimmedValue);
               }
             }}
           />
           <div
-            onClick={() => updateQty(i, (parseInt(quantities[i]) + 1).toString())}
+            onClick={() => updateQty(cart._id, (parseInt(quantities[cart._id]) + 1).toString())}
             className="bg-foreground text-background cursor-pointer hover:bg-foreground/60 w-7 text-center rounded font-bold"
           >
             +

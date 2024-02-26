@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-background">
-        <Toaster richColors />
+        <Toaster richColors position="top-right" />
         <QueryProvider>
           <ThemeContext>{children}</ThemeContext>
         </QueryProvider>
