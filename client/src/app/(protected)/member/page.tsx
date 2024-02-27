@@ -43,7 +43,7 @@ function MemberPage() {
   } = useQuery({
     queryKey: ["member", currentPage, debouncedValue, typeView],
     queryFn: async () => {
-      return await MemberService.getMyMember({ limit: 2, page: currentPage, q: debouncedValue, type: typeView });
+      return await MemberService.getMyMember({ limit: 10, page: currentPage, q: debouncedValue, type: typeView });
     },
   });
 

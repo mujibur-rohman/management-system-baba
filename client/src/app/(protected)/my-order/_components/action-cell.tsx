@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { CheckCircle2Icon, CheckIcon, Edit2Icon, Loader2Icon, MoreHorizontalIcon, TrashIcon, Wallet2Icon } from "lucide-react";
+import { CheckCircle2Icon, CheckIcon, Edit2Icon, EyeIcon, Loader2Icon, MoreHorizontalIcon, TrashIcon, Wallet2Icon } from "lucide-react";
 import React, { useState } from "react";
 import ContentEdit from "./content-edit";
 import { useQueryClient } from "@tanstack/react-query";
@@ -9,11 +9,13 @@ import { toast } from "sonner";
 import OrderService from "@/services/order/order.service";
 import AmountForm from "./amount-form";
 import useAuth from "@/hooks/useAuth";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 function ActionCellMyOrder({ order }: { order: OrderTypes }) {
   const [isOpenDialog, setOpenDialog] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [typeAction, setTypeAction] = useState<"confirm" | "edit" | "amount" | "delete" | null>(null);
+  const [typeAction, setTypeAction] = useState<"confirm" | "edit" | "amount" | "delete" | "detail" | null>(null);
 
   const queryClient = useQueryClient();
   const auth = useAuth();
@@ -60,6 +62,42 @@ function ActionCellMyOrder({ order }: { order: OrderTypes }) {
     switch (val) {
       case "amount":
         return <AmountForm setDialog={setOpenDialog} order={order} />;
+      case "detail":
+        return (
+          <>
+            <DialogHeader>
+              <DialogTitle>Detail Order</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col justify-between">
+              <div className="flex justify-between py-2">
+                <p>Nomor Pesanan</p>
+                <p className="font-medium">{order.noOrder}</p>
+              </div>
+              <div className="flex justify-between py-2">
+                <p>Kuantiti</p>
+                <p className="font-medium">
+                  {(JSON.parse(order.cartData) as Cart[]).reduce((accumulator, currentValue) => {
+                    return accumulator + currentValue.qty * 1;
+                  }, 0)}
+                </p>
+              </div>
+              <div className="flex justify-between py-2">
+                <p>Total Harga</p>
+                <p className="font-medium">{order.totalPrice}</p>
+              </div>
+              <Separator />
+              <p className="mt-3 font-medium text-lg">Daftar Aroma</p>
+              <ScrollArea className="max-h-56 px-4 flex flex-col gap-4 border rounded-md mt-3">
+                {(JSON.parse(order.cartData) as Cart[]).map((cart) => (
+                  <div key={cart.id} className="flex justify-between py-3 border-b last:border-none">
+                    <p className="text-sm">{cart.product.aromaLama}</p>
+                    <span>{cart.qty}</span>
+                  </div>
+                ))}
+              </ScrollArea>
+            </div>
+          </>
+        );
       case "confirm":
         return (
           <>
@@ -149,15 +187,26 @@ function ActionCellMyOrder({ order }: { order: OrderTypes }) {
               </DropdownMenuItem>
             </>
           ) : (
-            <DropdownMenuItem
-              onClick={() => {
-                setOpenDialog(true);
-                setTypeAction("amount");
-              }}
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <Wallet2Icon className="w-4 h-4 text-foreground" /> Pembayaran
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuItem
+                onClick={() => {
+                  setOpenDialog(true);
+                  setTypeAction("amount");
+                }}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Wallet2Icon className="w-4 h-4 text-foreground" /> Pembayaran
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setOpenDialog(true);
+                  setTypeAction("detail");
+                }}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <EyeIcon className="w-4 h-4 text-foreground" /> Detail
+              </DropdownMenuItem>
+            </>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
