@@ -27,6 +27,12 @@ const OrderService = {
     }>(`${ORDER_PATHNAME}/${id}`, payload);
     return res.data;
   },
+  amountOrder: async ({ id, payload }: { id: number; payload: any }) => {
+    const res = await axiosInitialize.put<{
+      message: string;
+    }>(`${ORDER_PATHNAME}/amount/${id}`, payload);
+    return res.data;
+  },
   confirmOrder: async ({ id, payload }: { id: number; payload: any }) => {
     const res = await axiosInitialize.post<{
       message: string;

@@ -5,7 +5,12 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
-import { ConfirmOrderDto, CreateOrderDto, EditOrderDto } from './dto/order.dto';
+import {
+  AmountOrderDto,
+  ConfirmOrderDto,
+  CreateOrderDto,
+  EditOrderDto,
+} from './dto/order.dto';
 import { ProductService } from 'src/product/product.service';
 import { User } from '@prisma/client';
 
@@ -87,6 +92,38 @@ export class OrderService {
     };
   }
 
+  async amountOrder(idOrder: number, amountDto: AmountOrderDto) {
+    const availableOrder = await this.prisma.order.findFirst({
+      where: {
+        id: idOrder,
+      },
+    });
+
+    if (!availableOrder) {
+      throw new NotFoundException('Orderan tidak ditemukan');
+    }
+
+    await this.prisma.order.update({
+      where: {
+        id: availableOrder.id,
+      },
+      data: {
+        remainingAmount: amountDto.remainingAmount,
+        amountCash: (
+          parseInt(availableOrder.amountCash) + parseInt(amountDto.amountCash)
+        ).toString(),
+        amountTrf: (
+          parseInt(availableOrder.amountTrf) + parseInt(amountDto.amountTrf)
+        ).toString(),
+        cartData: availableOrder.cartData,
+      },
+    });
+
+    return {
+      message: 'Pembayaran di update!',
+    };
+  }
+
   async getOrder({
     limit,
     page,
@@ -162,8 +199,6 @@ export class OrderService {
         message: 'cek stok dulu',
       };
     }
-
-    console.log(confimOrderDto.cart);
 
     await this.prisma.order.update({
       where: {

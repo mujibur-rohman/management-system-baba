@@ -7,6 +7,8 @@ import ContentEdit from "./content-edit";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import OrderService from "@/services/order/order.service";
+import AmountForm from "./amount-form";
+import useAuth from "@/hooks/useAuth";
 
 function ActionCellMyOrder({ order }: { order: OrderTypes }) {
   const [isOpenDialog, setOpenDialog] = useState(false);
@@ -14,6 +16,7 @@ function ActionCellMyOrder({ order }: { order: OrderTypes }) {
   const [typeAction, setTypeAction] = useState<"confirm" | "edit" | "amount" | "delete" | null>(null);
 
   const queryClient = useQueryClient();
+  const auth = useAuth();
 
   const openChangeWrapper = (value: boolean) => {
     setOpenDialog(value);
@@ -56,7 +59,7 @@ function ActionCellMyOrder({ order }: { order: OrderTypes }) {
   const renderContent = (val: typeof typeAction) => {
     switch (val) {
       case "amount":
-        return <div>Amount</div>;
+        return <AmountForm setDialog={setOpenDialog} order={order} />;
       case "confirm":
         return (
           <>
@@ -108,47 +111,54 @@ function ActionCellMyOrder({ order }: { order: OrderTypes }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={() => {
-              setOpenDialog(true);
-              setTypeAction("confirm");
-            }}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <CheckCircle2Icon className="w-4 h-4 text-foreground" /> Konfirmasi
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              setOpenDialog(true);
-              setTypeAction("edit");
-            }}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <Edit2Icon className="w-4 h-4 text-foreground" /> Ubah Pesanan
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={() => {
-              setOpenDialog(true);
-              setTypeAction("delete");
-            }}
-          >
-            <DialogTrigger asChild>
-              <>
-                <TrashIcon className="w-4 h-4 text-foreground" />
-                <span>Batalkan Pesanan</span>
-              </>
-            </DialogTrigger>
-          </DropdownMenuItem>
-          {/* <DropdownMenuItem
-            onClick={() => {
-              setOpenDialog(true);
-              setTypeAction("edit");
-            }}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <Wallet2Icon className="w-4 h-4 text-foreground" /> Pembayaran
-          </DropdownMenuItem> */}
+          {!order.isConfirm ? (
+            <>
+              {auth?.user?.parentId ? null : (
+                <DropdownMenuItem
+                  onClick={() => {
+                    setOpenDialog(true);
+                    setTypeAction("confirm");
+                  }}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <CheckCircle2Icon className="w-4 h-4 text-foreground" /> Konfirmasi
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                onClick={() => {
+                  setOpenDialog(true);
+                  setTypeAction("edit");
+                }}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Edit2Icon className="w-4 h-4 text-foreground" /> Ubah Pesanan
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => {
+                  setOpenDialog(true);
+                  setTypeAction("delete");
+                }}
+              >
+                <DialogTrigger asChild>
+                  <>
+                    <TrashIcon className="w-4 h-4 text-foreground" />
+                    <span>Batalkan Pesanan</span>
+                  </>
+                </DialogTrigger>
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <DropdownMenuItem
+              onClick={() => {
+                setOpenDialog(true);
+                setTypeAction("amount");
+              }}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <Wallet2Icon className="w-4 h-4 text-foreground" /> Pembayaran
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
       <DialogContent className="sm:max-w-[425px]">{renderContent(typeAction)}</DialogContent>

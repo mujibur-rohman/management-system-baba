@@ -40,17 +40,17 @@ export const columns: ColumnDef<OrderTypes>[] = [
     },
   },
   {
-    accessorKey: "bayarTf",
-    header: "Transfer",
-    cell: ({ row }) => {
-      return row.original.amountTrf;
-    },
-  },
-  {
     accessorKey: "bayarCash",
     header: "Cash",
     cell: ({ row }) => {
       return row.original.amountCash;
+    },
+  },
+  {
+    accessorKey: "bayarTf",
+    header: "Transfer",
+    cell: ({ row }) => {
+      return row.original.amountTrf;
     },
   },
   {

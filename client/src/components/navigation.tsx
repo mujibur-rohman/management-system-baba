@@ -66,7 +66,7 @@ function MenuItem({ pathname }: { pathname: string }) {
         <ShoppingCartIcon />
         <span className="text-xs">Order</span>
       </Link>
-      <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
+      <Link href="/order-team" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
         <ArchiveRestoreIcon />
         <span className="text-xs">Orderan Tim</span>
       </Link>

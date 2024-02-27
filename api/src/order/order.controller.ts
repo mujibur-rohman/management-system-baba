@@ -13,7 +13,12 @@ import {
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { AccessTokenGuard } from 'src/guards/access-token.guard';
-import { ConfirmOrderDto, CreateOrderDto, EditOrderDto } from './dto/order.dto';
+import {
+  AmountOrderDto,
+  ConfirmOrderDto,
+  CreateOrderDto,
+  EditOrderDto,
+} from './dto/order.dto';
 import { Request } from 'express';
 import { User } from '@prisma/client';
 
@@ -53,6 +58,21 @@ export class OrderController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @Put('/amount/:id')
+  async amountOrder(
+    @Body() amountDto: AmountOrderDto,
+    @Param('id') idOrder: string,
+  ) {
+    console.log(idOrder);
+    const result = await this.orderService.amountOrder(
+      parseInt(idOrder),
+      amountDto,
+    );
+
+    return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Get('/')
   async getOrders(
     @Req() request: Request,
@@ -67,7 +87,7 @@ export class OrderController {
     return await this.orderService.getOrder({
       limit: limit * 1,
       page: page * 1,
-      userData: request as any,
+      userData: request.user as any,
       q,
     });
   }
