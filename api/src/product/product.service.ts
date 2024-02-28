@@ -64,6 +64,7 @@ export class ProductService {
           userId: userData.id,
           aromaLama: product[0],
           aromaBaru: product[1],
+          codeProduct: product[2],
           stock: 0,
         },
       });

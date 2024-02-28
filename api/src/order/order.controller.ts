@@ -79,6 +79,7 @@ export class OrderController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('q') q: string = '',
+    @Query('userId') userId?: string,
   ) {
     if (!request.user) {
       throw new UnauthorizedException();
@@ -89,6 +90,7 @@ export class OrderController {
       page: page * 1,
       userData: request.user as any,
       q,
+      userId: parseInt(userId),
     });
   }
 

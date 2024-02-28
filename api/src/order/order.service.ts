@@ -129,17 +129,19 @@ export class OrderService {
     page,
     userData,
     q,
+    userId,
   }: {
     page: number;
     limit: number;
     userData: User;
     q: string;
+    userId?: number;
   }) {
     const offset = limit * page - limit;
 
     const totalRows = await this.prisma.order.count({
       where: {
-        userId: userData.id,
+        userId: userId || userData.id,
         noOrder: {
           contains: q,
         },
@@ -150,7 +152,7 @@ export class OrderService {
 
     const orders = await this.prisma.order.findMany({
       where: {
-        userId: userData.id,
+        userId: userId || userData.id,
         noOrder: {
           contains: q,
         },
@@ -223,12 +225,17 @@ export class OrderService {
           throw new NotFoundException('Ada produk yang tidak ditemukan');
         }
 
+        console.log(cart);
+
         await this.prisma.product.update({
           where: {
             id: availableProduct.id,
           },
           data: {
-            stock: availableProduct.stock + cart.qty,
+            stock:
+              availableProduct.stock + typeof cart.qty === 'string'
+                ? parseInt(cart.qty as any)
+                : cart.qty,
           },
         });
       } catch (error) {

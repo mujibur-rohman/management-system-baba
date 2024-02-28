@@ -66,6 +66,12 @@ export class MemberController {
     return result;
   }
 
+  @Get('/:id')
+  async getMemberById(@Param('id') id: string) {
+    const result = this.memberService.getMemberById(parseInt(id));
+    return result;
+  }
+
   @UseGuards(AccessTokenGuard)
   @Post('/reset-password/:id')
   async resetPassword(

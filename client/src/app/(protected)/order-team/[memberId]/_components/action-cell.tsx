@@ -3,16 +3,16 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CheckCircle2Icon, CheckIcon, Edit2Icon, EyeIcon, Loader2Icon, MoreHorizontalIcon, TrashIcon, Wallet2Icon } from "lucide-react";
 import React, { useState } from "react";
-import ContentEdit from "./content-edit";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import OrderService from "@/services/order/order.service";
-import AmountForm from "./amount-form";
 import useAuth from "@/hooks/useAuth";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ContentEdit from "@/app/(protected)/my-order/_components/content-edit";
+import AmountForm from "@/app/(protected)/my-order/_components/amount-form";
 
-function ActionCellMyOrder({ order }: { order: OrderTypes }) {
+function ActionCelOrderTeam({ order }: { order: OrderTypes }) {
   const [isOpenDialog, setOpenDialog] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [typeAction, setTypeAction] = useState<"confirm" | "edit" | "amount" | "delete" | "detail" | null>(null);
@@ -217,4 +217,4 @@ function ActionCellMyOrder({ order }: { order: OrderTypes }) {
   );
 }
 
-export default ActionCellMyOrder;
+export default ActionCelOrderTeam;

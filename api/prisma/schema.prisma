@@ -49,6 +49,7 @@ model Product {
    aromaLama      String
    aromaBaru      String
    stock          Int
+   codeProduct    String
    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
    userId         Int    
    cart           Cart[]

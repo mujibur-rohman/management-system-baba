@@ -31,6 +31,10 @@ const MemberService = {
     }>(`${MEMBER_PATHNAME}/${id}`);
     return res.data;
   },
+  getMemberById: async (id: string) => {
+    const res = await axiosInitialize.get<MemberTypesProfile>(`${MEMBER_PATHNAME}/${id}`);
+    return res.data;
+  },
   resetPassword: async (id: string, password: string) => {
     const res = await axiosInitialize.post<{
       message: string;

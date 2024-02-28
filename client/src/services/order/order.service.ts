@@ -4,12 +4,13 @@ import { PaginationInterface } from "@/interface/pagination";
 export const ORDER_PATHNAME = "/order";
 
 const OrderService = {
-  getOrders: async ({ limit = 10, page = 1, q }: { limit?: number; page: number; q: string }) => {
+  getOrders: async ({ limit = 10, page = 1, q, userId }: { limit?: number; page: number; q: string; userId?: string }) => {
     const res = await axiosInitialize.get<PaginationInterface<OrderTypes>>(ORDER_PATHNAME, {
       params: {
         limit,
         page,
         q,
+        userId,
       },
     });
     return res.data;

@@ -245,4 +245,25 @@ export class MemberService {
 
     return { message: `Member berhasil dihapus` };
   }
+
+  async getMemberById(id: number) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        idMember: true,
+        avatar: true,
+        role: true,
+        name: true,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    return user;
+  }
 }
