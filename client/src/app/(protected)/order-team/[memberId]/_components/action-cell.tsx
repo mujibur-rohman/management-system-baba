@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ContentEdit from "@/app/(protected)/my-order/_components/content-edit";
 import AmountForm from "@/app/(protected)/my-order/_components/amount-form";
+import { useParams } from "next/navigation";
 
 function ActionCelOrderTeam({ order }: { order: OrderTypes }) {
   const [isOpenDialog, setOpenDialog] = useState(false);
@@ -19,6 +20,7 @@ function ActionCelOrderTeam({ order }: { order: OrderTypes }) {
 
   const queryClient = useQueryClient();
   const auth = useAuth();
+  const params = useParams();
 
   const openChangeWrapper = (value: boolean) => {
     setOpenDialog(value);
@@ -38,6 +40,7 @@ function ActionCelOrderTeam({ order }: { order: OrderTypes }) {
             id: order.id,
             payload: {
               cart: JSON.parse(order.cartData),
+              memberUserId: parseInt(params.memberId as string),
             },
           });
           queryClient.invalidateQueries();
@@ -151,17 +154,15 @@ function ActionCelOrderTeam({ order }: { order: OrderTypes }) {
         <DropdownMenuContent align="end">
           {!order.isConfirm ? (
             <>
-              {auth?.user?.parentId ? null : (
-                <DropdownMenuItem
-                  onClick={() => {
-                    setOpenDialog(true);
-                    setTypeAction("confirm");
-                  }}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <CheckCircle2Icon className="w-4 h-4 text-foreground" /> Konfirmasi
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem
+                onClick={() => {
+                  setOpenDialog(true);
+                  setTypeAction("confirm");
+                }}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <CheckCircle2Icon className="w-4 h-4 text-foreground" /> Konfirmasi
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
                   setOpenDialog(true);
@@ -188,17 +189,15 @@ function ActionCelOrderTeam({ order }: { order: OrderTypes }) {
             </>
           ) : (
             <>
-              {auth?.user?.parentId ? null : (
-                <DropdownMenuItem
-                  onClick={() => {
-                    setOpenDialog(true);
-                    setTypeAction("amount");
-                  }}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <Wallet2Icon className="w-4 h-4 text-foreground" /> Pembayaran
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem
+                onClick={() => {
+                  setOpenDialog(true);
+                  setTypeAction("amount");
+                }}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Wallet2Icon className="w-4 h-4 text-foreground" /> Pembayaran
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
                   setOpenDialog(true);

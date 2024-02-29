@@ -4,5 +4,6 @@ type Cart = {
   price: string;
   userId: number;
   productId: number;
+  codeProduct: string;
   product: ProductTypes;
 };

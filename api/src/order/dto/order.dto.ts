@@ -1,5 +1,5 @@
 import { Cart } from '@prisma/client';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateOrderDto {
   @IsNotEmpty({ message: 'Total price is required.' })
@@ -13,6 +13,9 @@ export class CreateOrderDto {
 
   @IsNotEmpty({ message: 'Remaining amount is required.' })
   remainingAmount: string;
+
+  @IsNotEmpty({ message: 'Cart is required.' })
+  carts: object;
 }
 
 export class EditOrderDto {
@@ -40,4 +43,7 @@ export class AmountOrderDto {
 export class ConfirmOrderDto {
   @IsNotEmpty({ message: 'Cart is required.' })
   cart: Cart[];
+
+  @IsOptional()
+  memberUserId: number;
 }

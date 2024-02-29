@@ -76,11 +76,13 @@ function CartList({ carts }: { carts: { data: Cart[] } | undefined }) {
   const handleOrder = async () => {
     try {
       setIsLoading(true);
+      console.log(fieldsCart);
       const res = await OrderService.addOrder({
         amountCash: "0",
         amountTrf: "0",
         remainingAmount: getTotalPrice().toString(),
         totalPrice: getTotalPrice().toString(),
+        carts: fieldsCart.map((cart) => ({ ...cart, qty: quantities[cart._id as any] })),
       });
       setDataOrder({
         noOrder: res.data.noOrder,

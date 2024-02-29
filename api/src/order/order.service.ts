@@ -48,7 +48,7 @@ export class OrderService {
         userId: userData.id,
         sellerId: userData.parentId || null,
         isConfirm: false,
-        cartData: JSON.stringify(carts.data, null, 2),
+        cartData: JSON.stringify(createOrderDto.carts, null, 2),
       },
     });
 
@@ -182,6 +182,145 @@ export class OrderService {
     userData: User;
     confimOrderDto: ConfirmOrderDto;
   }) {
+    // * check apakah stok tersedia
+    if (!confimOrderDto.memberUserId) {
+      const processTopLevel = confimOrderDto.cart.map(async (cart) => {
+        try {
+          const availableProduct = await this.prisma.product.findFirst({
+            where: {
+              id: cart.productId,
+            },
+          });
+
+          if (!availableProduct) {
+            throw new NotFoundException('Ada produk yang tidak ditemukan');
+          }
+
+          await this.prisma.product.update({
+            where: {
+              id: availableProduct.id,
+            },
+            data: {
+              stock:
+                availableProduct.stock +
+                (typeof cart.qty === 'string'
+                  ? parseInt(cart.qty as any)
+                  : cart.qty),
+            },
+          });
+        } catch (error) {
+          throw new Error(error.message);
+        }
+      });
+      await Promise.all(processTopLevel);
+    } else {
+      // * check stock parent
+      const checkStock = confimOrderDto.cart.map(async (cart) => {
+        try {
+          const availableProduct = await this.prisma.product.findFirst({
+            where: {
+              AND: [
+                {
+                  userId: userData.id,
+                },
+                {
+                  codeProduct: cart.codeProduct,
+                },
+              ],
+            },
+          });
+          if (!availableProduct) {
+            throw new NotFoundException('Ada produk yang tidak ditemukan');
+          }
+
+          console.log(availableProduct, userData);
+
+          if (availableProduct.stock < cart.qty) {
+            throw new BadRequestException(
+              `Aroma ${availableProduct.aromaLama}/${availableProduct.aromaBaru} melebihi batas, karena sisa stok ${availableProduct.stock}`,
+            );
+          }
+        } catch (error) {
+          throw new BadRequestException(error.message);
+        }
+      });
+      await Promise.all(checkStock);
+
+      // * process stock parent
+      const reduceStockParent = confimOrderDto.cart.map(async (cart) => {
+        try {
+          const availableProduct = await this.prisma.product.findFirst({
+            where: {
+              AND: [
+                {
+                  userId: userData.id,
+                },
+                {
+                  codeProduct: cart.codeProduct,
+                },
+              ],
+            },
+          });
+          if (!availableProduct) {
+            throw new NotFoundException('Ada produk yang tidak ditemukan');
+          }
+
+          await this.prisma.product.update({
+            where: {
+              id: availableProduct.id,
+            },
+            data: {
+              stock:
+                availableProduct.stock -
+                (typeof cart.qty === 'string'
+                  ? parseInt(cart.qty as any)
+                  : cart.qty),
+            },
+          });
+        } catch (error) {
+          throw new Error(error.message);
+        }
+      });
+      await Promise.all(reduceStockParent);
+
+      // * process stock member
+      const addStockMember = confimOrderDto.cart.map(async (cart) => {
+        try {
+          const availableProduct = await this.prisma.product.findFirst({
+            where: {
+              AND: [
+                {
+                  userId: confimOrderDto.memberUserId,
+                },
+                {
+                  codeProduct: cart.codeProduct,
+                },
+              ],
+            },
+          });
+          if (!availableProduct) {
+            throw new NotFoundException('Ada produk yang tidak ditemukan');
+          }
+
+          await this.prisma.product.update({
+            where: {
+              id: availableProduct.id,
+            },
+            data: {
+              stock:
+                availableProduct.stock +
+                (typeof cart.qty === 'string'
+                  ? parseInt(cart.qty as any)
+                  : cart.qty),
+            },
+          });
+        } catch (error) {
+          throw new Error(error.message);
+        }
+      });
+      await Promise.all(addStockMember);
+    }
+
     const order = await this.prisma.order.findFirst({
       where: {
         id,
@@ -196,12 +335,6 @@ export class OrderService {
       throw new BadRequestException('order sudah terkonfirmasi');
     }
 
-    if (userData.parentId) {
-      return {
-        message: 'cek stok dulu',
-      };
-    }
-
     await this.prisma.order.update({
       where: {
         id: order.id,
@@ -211,49 +344,9 @@ export class OrderService {
       },
     });
 
-    // * update stok user
-    let errorData = 0;
-    const promises = confimOrderDto.cart.map(async (cart) => {
-      try {
-        const availableProduct = await this.prisma.product.findFirst({
-          where: {
-            id: cart.productId,
-          },
-        });
-
-        if (!availableProduct) {
-          throw new NotFoundException('Ada produk yang tidak ditemukan');
-        }
-
-        console.log(cart);
-
-        await this.prisma.product.update({
-          where: {
-            id: availableProduct.id,
-          },
-          data: {
-            stock:
-              availableProduct.stock + typeof cart.qty === 'string'
-                ? parseInt(cart.qty as any)
-                : cart.qty,
-          },
-        });
-      } catch (error) {
-        errorData++;
-      }
-    });
-
-    await Promise.all(promises);
-
-    if (errorData > 0) {
-      return {
-        message: `Orderan berhasil dikonfirmasi!, ada ${errorData} produk yang gagal`,
-      };
-    } else {
-      return {
-        message: 'Orderan berhasil dikonfirmasi',
-      };
-    }
+    return {
+      message: 'Orderan berhasil dikonfirmasi',
+    };
   }
 
   async deleteOrder(id: number) {

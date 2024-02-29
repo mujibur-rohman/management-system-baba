@@ -253,12 +253,22 @@ export class ProductService {
       throw new BadRequestException('Produk Sudah Ada Dipesanan');
     }
 
+    const availableProduct = await this.prisma.product.findFirst({
+      where: {
+        id: cartDto.productId,
+      },
+    });
+    if (!availableProduct) {
+      throw new NotFoundException('Ada produk yang tidak ditemukan');
+    }
+
     await this.prisma.cart.create({
       data: {
         productId: cartDto.productId,
         price: cartDto.price,
         qty: cartDto.qty,
         userId: userData.id,
+        codeProduct: availableProduct.codeProduct,
       },
     });
 

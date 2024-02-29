@@ -107,7 +107,7 @@ export class OrderController {
     }
 
     return await this.orderService.confirmOrder({
-      userData: request as any,
+      userData: request.user as any,
       confimOrderDto,
       id: parseInt(idOrder),
     });
