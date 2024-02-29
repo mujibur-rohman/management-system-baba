@@ -9,6 +9,7 @@ import ProductService from "@/services/product/product.service";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import OrderService from "@/services/order/order.service";
+import { useQueryClient } from "@tanstack/react-query";
 
 function CartList({ carts }: { carts: { data: Cart[] } | undefined }) {
   const { control } = useForm({ defaultValues: { carts: carts } });
@@ -17,6 +18,8 @@ function CartList({ carts }: { carts: { data: Cart[] } | undefined }) {
     name: "carts.data",
     keyName: "_id",
   });
+
+  const queryClient = useQueryClient();
 
   const [quantities, setQuantities] = useState<{ [key: number]: any }>(Object.fromEntries(fieldsCart.map((cart) => [cart._id, cart.qty])));
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -76,7 +79,6 @@ function CartList({ carts }: { carts: { data: Cart[] } | undefined }) {
   const handleOrder = async () => {
     try {
       setIsLoading(true);
-      console.log(fieldsCart);
       const res = await OrderService.addOrder({
         amountCash: "0",
         amountTrf: "0",
@@ -90,6 +92,7 @@ function CartList({ carts }: { carts: { data: Cart[] } | undefined }) {
         totalPrice: getTotalPrice().toString(),
       });
       remove();
+      queryClient.invalidateQueries();
       toast.success(res.message);
       setOpenDialog(true);
     } catch (error: any) {

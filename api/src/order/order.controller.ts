@@ -79,6 +79,8 @@ export class OrderController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('q') q: string = '',
+    @Query('year') year: string,
+    @Query('month') month: string,
     @Query('userId') userId?: string,
   ) {
     if (!request.user) {
@@ -91,6 +93,8 @@ export class OrderController {
       userData: request.user as any,
       q,
       userId: parseInt(userId),
+      year,
+      month,
     });
   }
 

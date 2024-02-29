@@ -77,7 +77,7 @@ function MenuItem({ pathname }: { pathname: string }) {
         })}
       >
         <PackageIcon />
-        <span className="text-xs">Orderan Saya</span>
+        <span className="text-xs whitespace-nowrap">Orderan Saya</span>
       </Link>
       <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
         <WalletIcon />

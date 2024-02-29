@@ -38,6 +38,11 @@ export class OrderService {
       throw new BadRequestException('Tidak ada pesanan');
     }
 
+    const date = ('0' + new Date().getDate()).slice(-2);
+    const currentMonth = new Date().getMonth() + 1;
+    const mo = ('0' + currentMonth).slice(-2);
+    const currentYear = new Date().getFullYear();
+
     const newOrder = await this.prisma.order.create({
       data: {
         noOrder,
@@ -49,6 +54,7 @@ export class OrderService {
         sellerId: userData.parentId || null,
         isConfirm: false,
         cartData: JSON.stringify(createOrderDto.carts, null, 2),
+        orderDate: new Date(`${currentYear}-${mo}-${date}`).toISOString(),
       },
     });
 
@@ -130,13 +136,26 @@ export class OrderService {
     userData,
     q,
     userId,
+    month,
+    year,
   }: {
     page: number;
     limit: number;
     userData: User;
     q: string;
+    year: string;
+    month: string;
     userId?: number;
   }) {
+    if (!year || !month) {
+      throw new BadRequestException('year and month params required');
+    }
+    const lastDayOfMonth = new Date(
+      parseInt(year),
+      parseInt(month),
+      0,
+    ).getDate();
+
     const offset = limit * page - limit;
 
     const totalRows = await this.prisma.order.count({
@@ -145,30 +164,52 @@ export class OrderService {
         noOrder: {
           contains: q,
         },
+        orderDate: {
+          lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
+          gte: new Date(`${year}-${month}-01`),
+        },
       },
     });
 
     const totalPage = Math.ceil(totalRows / limit);
-
     const orders = await this.prisma.order.findMany({
       where: {
         userId: userId || userData.id,
         noOrder: {
           contains: q,
         },
+        orderDate: {
+          lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
+          gte: new Date(`${year}-${month}-01`),
+        },
       },
       skip: offset,
       take: limit,
       orderBy: {
-        orderDate: 'asc',
+        createdAt: 'desc',
       },
     });
+
+    const remainAmountOrder = await this.prisma.order.findMany({
+      where: {
+        userId: userId || userData.id,
+        remainingAmount: {
+          not: '0',
+        },
+      },
+    });
+
+    const remainingAmount = remainAmountOrder.reduce(
+      (total, order) => total + parseInt(order.remainingAmount),
+      0,
+    );
 
     return {
       page,
       limit,
       totalRows,
       totalPage,
+      remainingAmount,
       data: orders,
     };
   }

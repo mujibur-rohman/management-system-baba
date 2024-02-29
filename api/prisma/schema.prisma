@@ -69,7 +69,7 @@ model Cart {
 model Order {
   id              Int      @id @default(autoincrement()) @map("_id")
   noOrder         String
-  orderDate       DateTime @default(now())
+  orderDate       DateTime   @db.Date()
   isConfirm       Boolean
   totalPrice      String
   amountTrf       String
@@ -79,4 +79,6 @@ model Order {
   cartData        String @db.LongText()  
   userId          Int   
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

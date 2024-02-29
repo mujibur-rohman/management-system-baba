@@ -5,6 +5,7 @@ import "moment/locale/id";
 import { json } from "stream/consumers";
 import ActionCellMyOrder from "./action-cell";
 import { Badge } from "@/components/ui/badge";
+import moment from "moment";
 
 export const columns: ColumnDef<OrderTypes>[] = [
   {
@@ -12,6 +13,13 @@ export const columns: ColumnDef<OrderTypes>[] = [
     header: "Nomor Order",
     cell: ({ row }) => {
       return row.original.noOrder;
+    },
+  },
+  {
+    accessorKey: "tglOrder",
+    header: "Tanggal Order",
+    cell: ({ row }) => {
+      return moment(row.original.orderDate).format("LL");
     },
   },
   {
