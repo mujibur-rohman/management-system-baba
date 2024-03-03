@@ -1,6 +1,6 @@
 "use client";
 
-import { ArchiveRestoreIcon, HomeIcon, MoreHorizontalIcon, Package2Icon, PackageIcon, ShoppingCartIcon, User2Icon, WalletIcon } from "lucide-react";
+import { ArchiveRestoreIcon, ArrowLeftRightIcon, HomeIcon, MoreHorizontalIcon, Package2Icon, PackageIcon, ShoppingCartIcon, User2Icon, WalletIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
@@ -84,8 +84,8 @@ function MenuItem({ pathname }: { pathname: string }) {
         <span className="text-xs">Keuangan</span>
       </Link>
       <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
-        <HomeIcon />
-        <span className="text-xs">Dashboard</span>
+        <ArrowLeftRightIcon />
+        <span className="text-xs">Tukar Aroma</span>
       </Link>
       <Link
         href="/product"
@@ -96,13 +96,14 @@ function MenuItem({ pathname }: { pathname: string }) {
         <Package2Icon />
         <span className="text-xs">Produk</span>
       </Link>
-      <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
-        <User2Icon />
-        <span className="text-xs">Member</span>
-      </Link>
-      <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
-        <User2Icon />
-        <span className="text-xs">Member</span>
+      <Link
+        href="/product"
+        className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
+          "bg-blue-500 text-white": pathname === "/product",
+        })}
+      >
+        <Package2Icon />
+        <span className="text-xs">Jadwal</span>
       </Link>
     </div>
   );

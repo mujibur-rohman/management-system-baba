@@ -7,7 +7,12 @@ import { User } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 import PRODUCT_DATA from 'src/config/product-setting';
-import { AddToCartDto, ArrEditCartDto } from './dto/product.dto';
+import {
+  AddSwitchProductDto,
+  AddToCartDto,
+  ArrEditCartDto,
+  ConfirmSwitchProductDto,
+} from './dto/product.dto';
 
 @Injectable()
 export class ProductService {
@@ -345,6 +350,93 @@ export class ProductService {
 
     return {
       data: carts,
+    };
+  }
+
+  async addSwitchProduct(userData: User, addSwitchDto: AddSwitchProductDto) {
+    const date = ('0' + new Date().getDate()).slice(-2);
+    const currentMonth = new Date().getMonth() + 1;
+    const mo = ('0' + currentMonth).slice(-2);
+    const currentYear = new Date().getFullYear();
+
+    await this.prisma.switchProduct.create({
+      data: {
+        userId: userData.id,
+        codeProduct: addSwitchDto.codeProduct,
+        isConfirm: false,
+        switchDate: new Date(`${currentYear}-${mo}-${date}`).toISOString(),
+      },
+    });
+
+    return {
+      message: 'Pengajuan tukar aroma berhasil, tunggu untuk dikonfirmasi!',
+    };
+  }
+
+  async confirmSwitchProduct(
+    userData: User,
+    confirmSwitchProductDto: ConfirmSwitchProductDto,
+  ) {
+    const availableProduct = await this.prisma.product.findFirst({
+      where: {
+        AND: [
+          {
+            userId: userData.id, // yang login (parentnya)
+          },
+          {
+            codeProduct: confirmSwitchProductDto.codeProduct,
+          },
+        ],
+      },
+    });
+
+    if (!availableProduct) {
+      throw new NotFoundException('Ada produk yang tidak ditemukan');
+    }
+
+    if (availableProduct.stock < confirmSwitchProductDto.qty) {
+      throw new BadRequestException(
+        `Jumlah melebihi batas, karena sisa stok ${availableProduct.stock}`,
+      );
+    }
+
+    await this.prisma.product.update({
+      where: {
+        id: availableProduct.id,
+      },
+      data: {
+        stock: availableProduct.stock - confirmSwitchProductDto.qty,
+      },
+    });
+
+    const productMember = await this.prisma.product.findFirst({
+      where: {
+        AND: [
+          {
+            userId: confirmSwitchProductDto.userId, // membernya
+          },
+          {
+            codeProduct: confirmSwitchProductDto.codeProduct,
+          },
+        ],
+      },
+    });
+
+    if (!productMember) {
+      throw new NotFoundException('Produk member tidak ditemukan');
+    }
+
+    await this.prisma.product.update({
+      where: {
+        id: productMember.id,
+      },
+      data: {
+        stock: productMember.stock + confirmSwitchProductDto.qty,
+      },
+    });
+
+    return {
+      message: 'Tukar aroma dikonfirmasi!',
     };
   }
 }

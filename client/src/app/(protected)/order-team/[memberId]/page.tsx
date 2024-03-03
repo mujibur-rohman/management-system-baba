@@ -78,7 +78,7 @@ function MemberOrder() {
       </div>
       <div className="border rounded-lg p-5">
         <div className="flex flex-col md:flex-row gap-3 mb-4 justify-between">
-          <Input className="w-[180px] md:order-1" placeholder="Search" value={search} onChange={handleChange} />
+          <Input className="w-[180px]" placeholder="Search" value={search} onChange={handleChange} />
           <div className="flex gap-3">
             <Select
               onValueChange={(val) => {

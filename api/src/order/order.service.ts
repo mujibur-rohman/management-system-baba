@@ -229,7 +229,14 @@ export class OrderService {
         try {
           const availableProduct = await this.prisma.product.findFirst({
             where: {
-              id: cart.productId,
+              AND: [
+                {
+                  userId: userData.id,
+                },
+                {
+                  codeProduct: cart.codeProduct,
+                },
+              ],
             },
           });
 
@@ -273,8 +280,6 @@ export class OrderService {
           if (!availableProduct) {
             throw new NotFoundException('Ada produk yang tidak ditemukan');
           }
-
-          console.log(availableProduct, userData);
 
           if (availableProduct.stock < cart.qty) {
             throw new BadRequestException(

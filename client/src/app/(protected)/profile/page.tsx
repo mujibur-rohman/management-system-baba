@@ -47,7 +47,7 @@ function ProfilePage() {
       </div>
       <div className="p-3 border border-border mt-5 rounded flex flex-wrap gap-5 justify-center">
         <div className="flex flex-col items-center gap-1">
-          <span className="text-xs font-semibold">Atasan Langsung</span>
+          <span className="text-xs font-semibold">Leader</span>
           <span>{user?.user?.parent?.name || "-"}</span>
         </div>
         <div className="flex flex-col items-center gap-1">

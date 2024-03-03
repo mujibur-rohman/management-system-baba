@@ -162,7 +162,7 @@ export class MemberService {
   async fetchNestedMembers(id: any) {
     const members = await this.prisma.user.findMany({
       where: {
-        parentId: id,
+        leaderSignedId: id,
       },
       select: {
         id: true,
