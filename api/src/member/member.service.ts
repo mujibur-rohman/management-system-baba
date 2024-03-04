@@ -61,9 +61,14 @@ export class MemberService {
     // * jika menambah role yang levelnya sama, maka parentnya ke leader
     let parentId: number | null = null;
     if (myRole.id === memberRole.id) {
+      // Jika menambah role yang levelnya sama, maka parentnya ke leader
       parentId = userData.parentId;
-    } else if (myRole.id > memberRole.id && userData.parentId) {
-      // * rekursif akan mencari leader teratas jika user mendaftarkan diatas rolenya
+    } else if (
+      (myRole.id > memberRole.id && userData.parentId) ||
+      (myRole.id === 3 && memberRole.id === 2) ||
+      (myRole.id === 2 && memberRole.id === 3)
+    ) {
+      // Rekursif akan mencari leader teratas jika user mendaftarkan di atas rolenya atau jika distributor mendaftarkan reseller-up atau sebaliknya
       parentId = await findUltimateParent(userData.parentId);
     } else {
       parentId = userData.id;
@@ -81,6 +86,7 @@ export class MemberService {
       joinDate: new Date(),
       leaderSignedId: userData.id,
     });
+
     return {
       data: user,
       message: 'Member berhasil didaftarkan',
@@ -105,7 +111,14 @@ export class MemberService {
 
       const totalRows = await this.prisma.user.count({
         where: {
-          parentId: userData.user.id,
+          OR: [
+            {
+              parentId: userData.user.id,
+            },
+            {
+              leaderSignedId: userData.user.id,
+            },
+          ],
           name: {
             contains: q,
           },
@@ -116,7 +129,14 @@ export class MemberService {
 
       const members = await this.prisma.user.findMany({
         where: {
-          parentId: userData.user.id,
+          OR: [
+            {
+              parentId: userData.user.id,
+            },
+            {
+              leaderSignedId: userData.user.id,
+            },
+          ],
           name: {
             contains: q,
           },

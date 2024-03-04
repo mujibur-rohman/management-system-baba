@@ -6,13 +6,25 @@ function BadgeStatus({ role }: { role: keyof typeof STATUS_MEMBER }) {
   switch (role) {
     case "SUPPLIER":
       return (
-        <Badge className="text-xs" variant="warning">
+        <Badge className="text-xs" variant="indigo">
           {role}
         </Badge>
       );
     case "DISTRIBUTOR":
       return (
         <Badge className="text-xs" variant="success">
+          {role}
+        </Badge>
+      );
+    case "RESELLER-UP":
+      return (
+        <Badge className="text-xs" variant="warning">
+          {role}
+        </Badge>
+      );
+    case "RESELLER-NC":
+      return (
+        <Badge className="text-xs" variant="secondary">
           {role}
         </Badge>
       );

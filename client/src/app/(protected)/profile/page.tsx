@@ -35,7 +35,7 @@ function ProfilePage() {
   return (
     <AppWrapper className="flex flex-col items-center py-5 pb-32">
       <AvatarProfile />
-      <div className="mt-3 space-y-1">
+      <div className="mt-3 space-y-1 text-center">
         <p className="text-foreground/50 text-center">{user?.user?.name}</p>
         <Badge variant="success">{user?.user?.role.toUpperCase()}</Badge>
       </div>

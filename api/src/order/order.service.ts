@@ -109,6 +109,8 @@ export class OrderService {
       throw new NotFoundException('Orderan tidak ditemukan');
     }
 
+    console.log(new Date(availableOrder.orderDate).toLocaleDateString());
+
     await this.prisma.order.update({
       where: {
         id: availableOrder.id,
@@ -124,6 +126,21 @@ export class OrderService {
         cartData: availableOrder.cartData,
       },
     });
+
+    //* process promoted reseller if 200 order
+    // const countQty = confimOrderDto.cart.reduce((accumulator, currentValue) => {
+    //   return accumulator + currentValue.qty * 1;
+    // }, 0);
+
+    // const countMember = await this.prisma.user.count({
+    //   where: {
+    //     leaderSignedId: confimOrderDto.memberUserId
+    //   }
+    // });
+
+    // console.log(countQty);
+
+    // if()
 
     return {
       message: 'Pembayaran di update!',

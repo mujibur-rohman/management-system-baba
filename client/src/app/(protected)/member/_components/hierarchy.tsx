@@ -33,7 +33,9 @@ function MemberView({ members, isChild }: { members: MemberTypesProfile; isChild
         </Avatar>
         <div className="flex flex-col gap-1 text-xs">
           <span className="capitalize font-medium">{name}</span>
-          <BadgeStatus role={role.toUpperCase() as keyof typeof STATUS_MEMBER} />
+          <div className="self-start">
+            <BadgeStatus role={role.toUpperCase() as keyof typeof STATUS_MEMBER} />
+          </div>
         </div>
       </div>
 

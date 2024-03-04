@@ -6,9 +6,12 @@ import React from "react";
 import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import useAuth from "@/hooks/useAuth";
+import { STATUS_MEMBER } from "@/services/auth/auth.types";
 
 function Navigation() {
   const pathname = usePathname();
+
   if (pathname === "/carts") return null;
   return (
     <div className="fixed grid grid-cols-4 gap-3 bottom-0 right-0 left-0 bg-background border-border border p-2 rounded-t-lg">
@@ -31,13 +34,13 @@ function Navigation() {
         <span className="text-xs">Produk</span>
       </Link>
       <Link
-        href="/member"
+        href="/order"
         className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
-          "bg-blue-500 text-white": pathname === "/member",
+          "bg-blue-500 text-white": pathname === "/order",
         })}
       >
-        <User2Icon />
-        <span className="text-xs">Member</span>
+        <ShoppingCartIcon />
+        <span className="text-xs">Order</span>
       </Link>
       <Drawer>
         <DrawerTrigger>
@@ -55,17 +58,21 @@ function Navigation() {
 }
 
 function MenuItem({ pathname }: { pathname: string }) {
+  const auth = useAuth();
   return (
     <div className="grid grid-cols-4 gap-3 py-2 m-3">
-      <Link
-        href="/order"
-        className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
-          "bg-blue-500 text-white": pathname === "/order",
-        })}
-      >
-        <ShoppingCartIcon />
-        <span className="text-xs">Order</span>
-      </Link>
+      {auth?.user?.role !== STATUS_MEMBER["RESELLER-NC"] && (
+        <Link
+          href="/member"
+          className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
+            "bg-blue-500 text-white": pathname === "/member",
+          })}
+        >
+          <User2Icon />
+          <span className="text-xs">Member</span>
+        </Link>
+      )}
+
       <Link href="/order-team" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
         <ArchiveRestoreIcon />
         <span className="text-xs">Orderan Tim</span>

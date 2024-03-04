@@ -9,5 +9,7 @@ export type LoginResponse = {
 export const STATUS_MEMBER = {
   SUPPLIER: "supplier",
   DISTRIBUTOR: "distributor",
+  ["RESELLER-UP"]: "reseller-up",
+  ["RESELLER-NC"]: "reseller-nc",
   RESELLER: "reseller",
 };
