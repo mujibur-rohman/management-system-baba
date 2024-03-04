@@ -12,7 +12,7 @@ import {
   EditOrderDto,
 } from './dto/order.dto';
 import { ProductService } from 'src/product/product.service';
-import { User } from '@prisma/client';
+import { Cart, User } from '@prisma/client';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const randomAlphanumeric = require('randomstring');
@@ -109,9 +109,12 @@ export class OrderService {
       throw new NotFoundException('Orderan tidak ditemukan');
     }
 
-    console.log(new Date(availableOrder.orderDate).toLocaleDateString());
+    console.log(
+      new Date(availableOrder.orderDate).toLocaleDateString() ===
+        new Date().toLocaleDateString(),
+    );
 
-    await this.prisma.order.update({
+    const updatedOrder = await this.prisma.order.update({
       where: {
         id: availableOrder.id,
       },
@@ -128,19 +131,68 @@ export class OrderService {
     });
 
     //* process promoted reseller if 200 order
-    // const countQty = confimOrderDto.cart.reduce((accumulator, currentValue) => {
-    //   return accumulator + currentValue.qty * 1;
-    // }, 0);
+    const userBuyer = await this.prisma.user.findFirst({
+      where: {
+        id: availableOrder.userId,
+      },
+    });
 
-    // const countMember = await this.prisma.user.count({
-    //   where: {
-    //     leaderSignedId: confimOrderDto.memberUserId
-    //   }
-    // });
+    const userSeller = await this.prisma.user.findFirst({
+      where: {
+        id: availableOrder.sellerId,
+      },
+    });
 
-    // console.log(countQty);
+    const cartData: Cart[] = JSON.parse(availableOrder.cartData);
 
-    // if()
+    const countQty = cartData.reduce((accumulator, currentValue) => {
+      return accumulator + currentValue.qty * 1;
+    }, 0);
+
+    const countMember = await this.prisma.user.count({
+      where: {
+        AND: [
+          {
+            leaderSignedId: userBuyer.id,
+          },
+          {
+            NOT: {
+              role: 'reseller-nc',
+            },
+          },
+        ],
+      },
+    });
+
+    if (
+      !['supplier', 'distributor', 'reseller-nc'].includes(userBuyer.role) &&
+      countQty >= 200 &&
+      parseInt(updatedOrder.remainingAmount) === 0 &&
+      new Date(availableOrder.orderDate).toLocaleDateString() ===
+        new Date().toLocaleDateString()
+    ) {
+      if (countMember >= 10) {
+        await this.prisma.user.update({
+          where: {
+            id: userBuyer.id,
+          },
+          data: {
+            role: 'distributor',
+            parentId: userSeller.parentId ? userSeller.parentId : userSeller.id,
+          },
+        });
+      } else {
+        await this.prisma.user.update({
+          where: {
+            id: userBuyer.id,
+          },
+          data: {
+            role: 'reseller-up',
+            parentId: userSeller.parentId ? userSeller.parentId : userSeller.id,
+          },
+        });
+      }
+    }
 
     return {
       message: 'Pembayaran di update!',

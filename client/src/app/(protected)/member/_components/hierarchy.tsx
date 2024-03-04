@@ -9,13 +9,13 @@ function Hierarchy({ members }: { members: PaginationInterface<MemberTypesProfil
   return (
     <div className="flex flex-col gap-2">
       {members?.data.map((member) => (
-        <MemberView key={member.id} members={member} isChild={false} />
+        <MemberView key={member.id} members={member} isChild={false} depth={0} />
       ))}
     </div>
   );
 }
 
-function MemberView({ members, isChild }: { members: MemberTypesProfile; isChild: boolean }) {
+function MemberView({ members, isChild, depth }: { members: MemberTypesProfile; isChild: boolean; depth: number }) {
   const { id, avatar, name, children, role } = members;
 
   return (
@@ -23,8 +23,10 @@ function MemberView({ members, isChild }: { members: MemberTypesProfile; isChild
       <div className="relative overflow-hidden flex items-center gap-2 border border-border pl-4 p-2 rounded">
         <div
           className={cn("absolute w-1 top-0 bottom-0 left-0", {
-            "bg-orange-400": isChild,
+            "bg-indigo-500": isChild && depth % 2 === 0,
             "bg-indigo-400": !isChild,
+            "bg-orange-500": isChild && depth % 2 !== 0,
+            // "bg-indigo-500": !isChild && depth % 2 !== 0,
           })}
         />
         <Avatar>
@@ -40,9 +42,9 @@ function MemberView({ members, isChild }: { members: MemberTypesProfile; isChild
       </div>
 
       {children && (
-        <div className="ml-4 mt-1 flex flex-col gap-1">
+        <div className="ml-10 mt-1 flex flex-col gap-1">
           {children.map((child) => (
-            <MemberView key={child.id} members={child} isChild />
+            <MemberView key={child.id} members={child} isChild depth={depth + 1} />
           ))}
         </div>
       )}

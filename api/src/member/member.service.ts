@@ -111,14 +111,7 @@ export class MemberService {
 
       const totalRows = await this.prisma.user.count({
         where: {
-          OR: [
-            {
-              parentId: userData.user.id,
-            },
-            {
-              leaderSignedId: userData.user.id,
-            },
-          ],
+          parentId: userData.user.id,
           name: {
             contains: q,
           },
@@ -129,14 +122,7 @@ export class MemberService {
 
       const members = await this.prisma.user.findMany({
         where: {
-          OR: [
-            {
-              parentId: userData.user.id,
-            },
-            {
-              leaderSignedId: userData.user.id,
-            },
-          ],
+          parentId: userData.user.id,
           name: {
             contains: q,
           },
