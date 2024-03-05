@@ -362,7 +362,10 @@ export class ProductService {
     await this.prisma.switchProduct.create({
       data: {
         userId: userData.id,
-        codeProduct: addSwitchDto.codeProduct,
+        newCodeProduct: addSwitchDto.newCodeProduct,
+        oldCodeProduct: addSwitchDto.oldCodeProduct,
+        sellerId: userData.parentId || null,
+        qty: addSwitchDto.qty,
         isConfirm: false,
         switchDate: new Date(`${currentYear}-${mo}-${date}`).toISOString(),
       },
@@ -374,69 +377,298 @@ export class ProductService {
   }
 
   async confirmSwitchProduct(
+    id: number,
     userData: User,
     confirmSwitchProductDto: ConfirmSwitchProductDto,
   ) {
-    const availableProduct = await this.prisma.product.findFirst({
+    if (!confirmSwitchProductDto.memberId) {
+      const availableOldProduct = await this.prisma.product.findFirst({
+        where: {
+          AND: [
+            {
+              userId: userData.id, // yang login (parentnya)
+            },
+            {
+              codeProduct: confirmSwitchProductDto.oldCodeProduct,
+            },
+          ],
+        },
+      });
+
+      if (!availableOldProduct) {
+        throw new NotFoundException('Produk lama tidak ditemukan');
+      }
+
+      if (availableOldProduct.stock < confirmSwitchProductDto.qty) {
+        throw new BadRequestException(
+          `Aroma ${availableOldProduct.aromaLama}/${availableOldProduct.aromaBaru} tidak bisa ditukan dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableOldProduct.stock}`,
+        );
+      }
+
+      await this.prisma.product.update({
+        where: {
+          id: availableOldProduct.id,
+        },
+        data: {
+          stock: availableOldProduct.stock - confirmSwitchProductDto.qty,
+        },
+      });
+
+      const availableNewProduct = await this.prisma.product.findFirst({
+        where: {
+          AND: [
+            {
+              userId: userData.id, // yang login (parentnya)
+            },
+            {
+              codeProduct: confirmSwitchProductDto.newCodeProduct,
+            },
+          ],
+        },
+      });
+
+      if (!availableNewProduct) {
+        throw new NotFoundException('Produk baru tidak ditemukan');
+      }
+
+      await this.prisma.product.update({
+        where: {
+          id: availableNewProduct.id,
+        },
+        data: {
+          stock: availableNewProduct.stock + confirmSwitchProductDto.qty,
+        },
+      });
+    } else {
+      // * proses leader product switch
+      const availableParentOldProduct = await this.prisma.product.findFirst({
+        where: {
+          AND: [
+            {
+              userId: userData.id,
+            },
+            {
+              codeProduct: confirmSwitchProductDto.oldCodeProduct,
+            },
+          ],
+        },
+      });
+
+      if (!availableParentOldProduct) {
+        throw new NotFoundException('Produk leader tidak ditemukan');
+      }
+
+      if (availableParentOldProduct.stock < confirmSwitchProductDto.qty) {
+        throw new BadRequestException(
+          `Aroma ${availableParentOldProduct.aromaLama}/${availableParentOldProduct.aromaBaru} tidak bisa ditukan dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableParentOldProduct.stock}`,
+        );
+      }
+
+      await this.prisma.product.update({
+        where: {
+          id: availableParentOldProduct.id,
+        },
+        data: {
+          stock: availableParentOldProduct.stock + confirmSwitchProductDto.qty,
+        },
+      });
+
+      const availableParentNewProduct = await this.prisma.product.findFirst({
+        where: {
+          AND: [
+            {
+              userId: userData.id,
+            },
+            {
+              codeProduct: confirmSwitchProductDto.newCodeProduct,
+            },
+          ],
+        },
+      });
+
+      if (!availableParentNewProduct) {
+        throw new NotFoundException('Produk leader tidak ditemukan');
+      }
+
+      if (availableParentNewProduct.stock < confirmSwitchProductDto.qty) {
+        throw new BadRequestException(
+          `Aroma ${availableParentNewProduct.aromaLama}/${availableParentNewProduct.aromaBaru} tidak bisa ditukan dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableParentNewProduct.stock}`,
+        );
+      }
+
+      await this.prisma.product.update({
+        where: {
+          id: availableParentNewProduct.id,
+        },
+        data: {
+          stock: availableParentNewProduct.stock - confirmSwitchProductDto.qty,
+        },
+      });
+
+      // * proses member product switch
+
+      const availableMemberNewProduct = await this.prisma.product.findFirst({
+        where: {
+          AND: [
+            {
+              userId: confirmSwitchProductDto.memberId,
+            },
+            {
+              codeProduct: confirmSwitchProductDto.newCodeProduct,
+            },
+          ],
+        },
+      });
+
+      if (!availableMemberNewProduct) {
+        throw new NotFoundException('Produk member tidak ditemukan');
+      }
+
+      if (availableMemberNewProduct.stock < confirmSwitchProductDto.qty) {
+        throw new BadRequestException(
+          `Aroma ${availableMemberNewProduct.aromaLama}/${availableMemberNewProduct.aromaBaru} tidak bisa ditukan dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableMemberNewProduct.stock}`,
+        );
+      }
+
+      await this.prisma.product.update({
+        where: {
+          id: availableMemberNewProduct.id,
+        },
+        data: {
+          stock: availableMemberNewProduct.stock + confirmSwitchProductDto.qty,
+        },
+      });
+
+      const availableMemberOldProduct = await this.prisma.product.findFirst({
+        where: {
+          AND: [
+            {
+              userId: confirmSwitchProductDto.memberId,
+            },
+            {
+              codeProduct: confirmSwitchProductDto.newCodeProduct,
+            },
+          ],
+        },
+      });
+
+      if (!availableMemberOldProduct) {
+        throw new NotFoundException('Produk member tidak ditemukan');
+      }
+
+      if (availableMemberOldProduct.stock < confirmSwitchProductDto.qty) {
+        throw new BadRequestException(
+          `Aroma ${availableMemberOldProduct.aromaLama}/${availableMemberOldProduct.aromaBaru} tidak bisa ditukan dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableMemberOldProduct.stock}`,
+        );
+      }
+
+      await this.prisma.product.update({
+        where: {
+          id: availableMemberOldProduct.id,
+        },
+        data: {
+          stock: availableMemberOldProduct.stock - confirmSwitchProductDto.qty,
+        },
+      });
+    }
+
+    const switchProduct = await this.prisma.switchProduct.findFirst({
       where: {
-        AND: [
-          {
-            userId: userData.id, // yang login (parentnya)
-          },
-          {
-            codeProduct: confirmSwitchProductDto.codeProduct,
-          },
-        ],
+        id,
       },
     });
 
-    if (!availableProduct) {
-      throw new NotFoundException('Ada produk yang tidak ditemukan');
+    if (!switchProduct) {
+      throw new BadRequestException('switch product not found');
     }
 
-    if (availableProduct.stock < confirmSwitchProductDto.qty) {
-      throw new BadRequestException(
-        `Jumlah melebihi batas, karena sisa stok ${availableProduct.stock}`,
-      );
+    if (switchProduct.isConfirm) {
+      throw new BadRequestException('sudah terkonfirmasi');
     }
 
-    await this.prisma.product.update({
+    await this.prisma.switchProduct.update({
       where: {
-        id: availableProduct.id,
+        id: switchProduct.id,
       },
       data: {
-        stock: availableProduct.stock - confirmSwitchProductDto.qty,
-      },
-    });
-
-    const productMember = await this.prisma.product.findFirst({
-      where: {
-        AND: [
-          {
-            userId: confirmSwitchProductDto.userId, // membernya
-          },
-          {
-            codeProduct: confirmSwitchProductDto.codeProduct,
-          },
-        ],
-      },
-    });
-
-    if (!productMember) {
-      throw new NotFoundException('Produk member tidak ditemukan');
-    }
-
-    await this.prisma.product.update({
-      where: {
-        id: productMember.id,
-      },
-      data: {
-        stock: productMember.stock + confirmSwitchProductDto.qty,
+        isConfirm: true,
       },
     });
 
     return {
       message: 'Tukar aroma dikonfirmasi!',
     };
+  }
+
+  async getSwitchProduct({
+    limit,
+    page,
+    userData,
+    type = 'self',
+  }: {
+    page: number;
+    limit: number;
+    userData: User;
+    type?: 'self' | 'team';
+  }) {
+    if (type === 'self') {
+      const offset = limit * page - limit;
+
+      const totalRows = await this.prisma.switchProduct.count({
+        where: {
+          userId: userData.id,
+        },
+      });
+
+      const totalPage = Math.ceil(totalRows / limit);
+
+      const switchProducts = await this.prisma.switchProduct.count({
+        where: {
+          userId: userData.id,
+        },
+        skip: offset,
+        take: limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+      return {
+        page,
+        limit,
+        totalRows,
+        totalPage,
+        data: switchProducts,
+      };
+    } else if (type === 'team') {
+      const offset = limit * page - limit;
+
+      const totalRows = await this.prisma.switchProduct.count({
+        where: {
+          sellerId: userData.id,
+        },
+      });
+
+      const totalPage = Math.ceil(totalRows / limit);
+
+      const switchProducts = await this.prisma.switchProduct.count({
+        where: {
+          userId: userData.id,
+        },
+        skip: offset,
+        take: limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+      return {
+        page,
+        limit,
+        totalRows,
+        totalPage,
+        data: switchProducts,
+      };
+    } else {
+      throw new BadRequestException('type must be self or team');
+    }
   }
 }

@@ -59,8 +59,11 @@ model Product {
 model SwitchProduct {
    id             Int      @id @default(autoincrement()) @map("_id")
    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-   userId         Int  
-   codeProduct    String
+   userId         Int
+   sellerId       Int?
+   qty            Int  
+   oldCodeProduct String
+   newCodeProduct String
    isConfirm      Boolean
    switchDate     DateTime   @db.Date()
    createdAt      DateTime @default(now())

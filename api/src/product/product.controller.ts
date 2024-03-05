@@ -16,7 +16,12 @@ import { ProductService } from './product.service';
 import { AccessTokenGuard } from 'src/guards/access-token.guard';
 import { Request } from 'express';
 import { User } from '@prisma/client';
-import { AddToCartDto, ArrEditCartDto } from './dto/product.dto';
+import {
+  AddSwitchProductDto,
+  AddToCartDto,
+  ArrEditCartDto,
+  ConfirmSwitchProductDto,
+} from './dto/product.dto';
 
 @Controller('product')
 export class ProductController {
@@ -130,5 +135,59 @@ export class ProductController {
         userData: request.user as User,
       });
     }
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('/add-switch')
+  async createOrder(
+    @Body() addSwitchProductDto: AddSwitchProductDto,
+    @Req() request: Request,
+  ) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    const result = await this.productService.addSwitchProduct(
+      request.user as User,
+      addSwitchProductDto,
+    );
+
+    return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('/switch-confirm/:id')
+  async comfirmOrder(
+    @Req() request: Request,
+    @Param('id') idSwitch: string,
+    @Body() confimSwitchDto: ConfirmSwitchProductDto,
+  ) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.productService.confirmSwitchProduct(
+      parseInt(idSwitch),
+      request.user as any,
+      confimSwitchDto,
+    );
+  }
+
+  async getSwitchProducts(
+    @Req() request: Request,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('type') type: string = 'self',
+  ) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.productService.getSwitchProduct({
+      limit: limit * 1,
+      page: page * 1,
+      userData: request.user as any,
+      type: type as 'self' | 'team',
+    });
   }
 }

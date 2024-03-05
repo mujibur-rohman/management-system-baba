@@ -1,5 +1,5 @@
 import { Cart } from '@prisma/client';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class AddToCartDto {
   @IsNotEmpty({ message: 'ProductId is required.' })
@@ -26,17 +26,26 @@ export class ArrEditCartDto {
 }
 
 export class ConfirmSwitchProductDto {
-  @IsNotEmpty({ message: 'User Id is required.' })
-  userId: number;
+  @IsOptional()
+  memberId: number;
 
-  @IsNotEmpty({ message: 'Code Product is required.' })
-  codeProduct: string;
+  @IsNotEmpty({ message: 'Old Code Product is required.' })
+  oldCodeProduct: string;
+
+  @IsNotEmpty({ message: 'New Code Product is required.' })
+  newCodeProduct: string;
 
   @IsNotEmpty({ message: 'Quantity is required.' })
   qty: number;
 }
 
 export class AddSwitchProductDto {
-  @IsNotEmpty({ message: 'Code Product is required.' })
-  codeProduct: string;
+  @IsNotEmpty({ message: 'Old Code Product is required.' })
+  oldCodeProduct: string;
+
+  @IsNotEmpty({ message: 'New Code Product is required.' })
+  newCodeProduct: string;
+
+  @IsNotEmpty({ message: 'Quantity Product is required.' })
+  qty: number;
 }

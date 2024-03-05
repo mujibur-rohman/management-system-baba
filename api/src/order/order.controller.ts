@@ -105,7 +105,6 @@ export class OrderController {
     @Param('id') idOrder: string,
     @Body() confimOrderDto: ConfirmOrderDto,
   ) {
-    console.log(idOrder);
     if (!request.user) {
       throw new UnauthorizedException();
     }
