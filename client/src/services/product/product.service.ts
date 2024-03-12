@@ -14,6 +14,14 @@ const ProductService = {
     });
     return res.data;
   },
+  getAllOptions: async () => {
+    const res = await axiosInitialize.get<ProductTypes[]>(`${PRODUCT_PATHNAME}/all`);
+    return res.data;
+  },
+  getAllParentOptions: async () => {
+    const res = await axiosInitialize.get<ProductTypes[]>(`${PRODUCT_PATHNAME}/parent-all`);
+    return res.data;
+  },
   getAllParent: async ({ limit = 10, page = 1, q = "" }: { limit?: number; page: number; q: string }) => {
     const res = await axiosInitialize.get<PaginationInterface<ProductTypes>>(`${PRODUCT_PATHNAME}/parent`, {
       params: {

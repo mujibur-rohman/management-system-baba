@@ -90,7 +90,7 @@ function MenuItem({ pathname }: { pathname: string }) {
         <WalletIcon />
         <span className="text-xs">Keuangan</span>
       </Link>
-      <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
+      <Link href="/switch" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
         <ArrowLeftRightIcon />
         <span className="text-xs">Tukar Aroma</span>
       </Link>

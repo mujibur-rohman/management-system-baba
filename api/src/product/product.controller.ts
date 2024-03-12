@@ -108,6 +108,17 @@ export class ProductController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @Get('/all')
+  async getProductAll(@Req() request: Request) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+    return await this.productService.getProductsAll({
+      userData: request.user as User,
+    });
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Get('/parent')
   async getProductParent(
     @Req() request: Request,
@@ -132,6 +143,25 @@ export class ProductController {
         limit,
         page,
         q,
+        userData: request.user as User,
+      });
+    }
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('/parent-all')
+  async getProductParentAll(@Req() request: Request) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    const userData = request.user as User;
+    if (userData.parentId) {
+      return await this.productService.getProductsParentAll({
+        userData: request.user as User,
+      });
+    } else {
+      return await this.productService.getProductsAll({
         userData: request.user as User,
       });
     }

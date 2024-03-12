@@ -240,6 +240,41 @@ export class ProductService {
     };
   }
 
+  async getProductsParentAll({ userData }: { userData: User }) {
+    const products = await this.prisma.product.findMany({
+      where: {
+        userId: userData.parentId,
+        stock: {
+          gt: 0,
+        },
+      },
+      orderBy: {
+        aromaLama: 'asc',
+      },
+      include: {
+        cart: true,
+      },
+    });
+
+    return products;
+  }
+
+  async getProductsAll({ userData }: { userData: User }) {
+    const products = await this.prisma.product.findMany({
+      where: {
+        userId: userData.id,
+      },
+      orderBy: {
+        aromaLama: 'asc',
+      },
+      include: {
+        cart: true,
+      },
+    });
+
+    return products;
+  }
+
   async addProductToCart({
     cartDto,
     userData,

@@ -2,6 +2,7 @@ type ProductTypes = {
   id: number;
   aromaLama: string;
   aromaBaru: string;
+  codeProduct: string;
   stock: number;
   cart?: {
     stock: number;
@@ -10,4 +11,4 @@ type ProductTypes = {
     userId: number;
   }[];
 };
-''
+("");
