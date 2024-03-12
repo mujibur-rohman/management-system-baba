@@ -1,5 +1,6 @@
 import axiosInitialize from "@/config/axios.config";
 import { PaginationInterface } from "@/interface/pagination";
+import { SwitchType } from "./switch.types";
 
 const PRODUCT_PATHNAME = "/product";
 
@@ -28,6 +29,24 @@ const ProductService = {
         limit,
         page,
         q,
+      },
+    });
+    return res.data;
+  },
+  addSwitch: async (payload: any) => {
+    const res = await axiosInitialize.post<{ message: string }>(`${PRODUCT_PATHNAME}/add-switch`, payload);
+    return res.data;
+  },
+  confirmSwitch: async ({ id, payload }: { payload: any; id: number }) => {
+    const res = await axiosInitialize.post<{ message: string }>(`${PRODUCT_PATHNAME}/switch-confirm/${id}`, payload);
+    return res.data;
+  },
+  getSwitch: async ({ limit = 10, page = 1, type = "self" }: { limit?: number; page: number; type: "self" | "team" }) => {
+    const res = await axiosInitialize.get<PaginationInterface<SwitchType>>(`${PRODUCT_PATHNAME}/switches`, {
+      params: {
+        limit,
+        page,
+        type,
       },
     });
     return res.data;

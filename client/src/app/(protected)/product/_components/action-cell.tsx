@@ -57,7 +57,7 @@ function ActionCellProduct({ id, stock }: { id: number; stock: number }) {
               setValue(inputValue);
               return;
             }
-            if (/^[0-9]*$/.test(inputValue)) {
+            if (/^[0-9]*$/.test(inputValue) && !inputValue.startsWith("0")) {
               setValue(inputValue);
             }
           }}

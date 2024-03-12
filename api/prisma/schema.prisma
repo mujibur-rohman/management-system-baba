@@ -64,6 +64,8 @@ model SwitchProduct {
    qty            Int  
    oldCodeProduct String
    newCodeProduct String
+   oldNameProd    String?
+   newNameProd    String?
    isConfirm      Boolean
    switchDate     DateTime   @db.Date()
    createdAt      DateTime @default(now())

@@ -263,6 +263,9 @@ export class ProductService {
     const products = await this.prisma.product.findMany({
       where: {
         userId: userData.id,
+        stock: {
+          gt: 0,
+        },
       },
       orderBy: {
         aromaLama: 'asc',
@@ -394,6 +397,35 @@ export class ProductService {
     const mo = ('0' + currentMonth).slice(-2);
     const currentYear = new Date().getFullYear();
 
+    const getNameProdNew = await this.prisma.product.findFirst({
+      where: {
+        AND: [
+          {
+            codeProduct: addSwitchDto.newCodeProduct,
+          },
+          {
+            userId: userData.id,
+          },
+        ],
+      },
+    });
+    const getNameProdOld = await this.prisma.product.findFirst({
+      where: {
+        AND: [
+          {
+            codeProduct: addSwitchDto.oldCodeProduct,
+          },
+          {
+            userId: userData.id,
+          },
+        ],
+      },
+    });
+
+    if (addSwitchDto.oldCodeProduct === addSwitchDto.newCodeProduct) {
+      throw new BadRequestException('Produk yang ditukar sama');
+    }
+
     await this.prisma.switchProduct.create({
       data: {
         userId: userData.id,
@@ -402,6 +434,12 @@ export class ProductService {
         sellerId: userData.parentId || null,
         qty: addSwitchDto.qty,
         isConfirm: false,
+        newNameProd:
+          getNameProdNew &&
+          `${getNameProdNew.aromaLama} / ${getNameProdNew.aromaBaru}`,
+        oldNameProd:
+          getNameProdOld &&
+          `${getNameProdOld.aromaLama} / ${getNameProdOld.aromaBaru}`,
         switchDate: new Date(`${currentYear}-${mo}-${date}`).toISOString(),
       },
     });
@@ -493,12 +531,6 @@ export class ProductService {
         throw new NotFoundException('Produk leader tidak ditemukan');
       }
 
-      if (availableParentOldProduct.stock < confirmSwitchProductDto.qty) {
-        throw new BadRequestException(
-          `Aroma ${availableParentOldProduct.aromaLama}/${availableParentOldProduct.aromaBaru} tidak bisa ditukan dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableParentOldProduct.stock}`,
-        );
-      }
-
       await this.prisma.product.update({
         where: {
           id: availableParentOldProduct.id,
@@ -527,7 +559,7 @@ export class ProductService {
 
       if (availableParentNewProduct.stock < confirmSwitchProductDto.qty) {
         throw new BadRequestException(
-          `Aroma ${availableParentNewProduct.aromaLama}/${availableParentNewProduct.aromaBaru} tidak bisa ditukan dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableParentNewProduct.stock}`,
+          `Aroma ${availableParentNewProduct.aromaLama}/${availableParentNewProduct.aromaBaru} tidak bisa ditukar dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableParentNewProduct.stock}`,
         );
       }
 
@@ -561,7 +593,7 @@ export class ProductService {
 
       if (availableMemberNewProduct.stock < confirmSwitchProductDto.qty) {
         throw new BadRequestException(
-          `Aroma ${availableMemberNewProduct.aromaLama}/${availableMemberNewProduct.aromaBaru} tidak bisa ditukan dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableMemberNewProduct.stock}`,
+          `Aroma ${availableMemberNewProduct.aromaLama}/${availableMemberNewProduct.aromaBaru} tidak bisa ditukar dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableMemberNewProduct.stock}`,
         );
       }
 
@@ -581,7 +613,7 @@ export class ProductService {
               userId: confirmSwitchProductDto.memberId,
             },
             {
-              codeProduct: confirmSwitchProductDto.newCodeProduct,
+              codeProduct: confirmSwitchProductDto.oldCodeProduct,
             },
           ],
         },
@@ -657,7 +689,7 @@ export class ProductService {
 
       const totalPage = Math.ceil(totalRows / limit);
 
-      const switchProducts = await this.prisma.switchProduct.count({
+      const switchProducts = await this.prisma.switchProduct.findMany({
         where: {
           userId: userData.id,
         },
@@ -685,14 +717,17 @@ export class ProductService {
 
       const totalPage = Math.ceil(totalRows / limit);
 
-      const switchProducts = await this.prisma.switchProduct.count({
+      const switchProducts = await this.prisma.switchProduct.findMany({
         where: {
-          userId: userData.id,
+          sellerId: userData.id,
         },
         skip: offset,
         take: limit,
         orderBy: {
           createdAt: 'desc',
+        },
+        include: {
+          user: true,
         },
       });
       return {

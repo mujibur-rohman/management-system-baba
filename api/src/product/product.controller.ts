@@ -203,6 +203,8 @@ export class ProductController {
     );
   }
 
+  @UseGuards(AccessTokenGuard)
+  @Get('/switches')
   async getSwitchProducts(
     @Req() request: Request,
     @Query('page') page: number = 1,
