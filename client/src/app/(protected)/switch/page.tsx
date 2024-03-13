@@ -78,9 +78,11 @@ function SwitchPage() {
             <span>Riwayat Saya</span>
           </Link>
         </Button>
-        <Button variant="outline" className="w-full flex items-center justify-center gap-3">
-          <Users2Icon />
-          <span>Riwayat Tim</span>
+        <Button asChild variant="outline">
+          <Link href="switch/team" className="w-full flex items-center justify-center gap-3">
+            <Users2Icon />
+            <span>Riwayat Tim</span>
+          </Link>
         </Button>
       </div>
       <Dialog open={isOpenDialog} onOpenChange={openChangeWrapper}>

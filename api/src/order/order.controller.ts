@@ -14,6 +14,7 @@ import {
 import { OrderService } from './order.service';
 import { AccessTokenGuard } from 'src/guards/access-token.guard';
 import {
+  AddClosingDto,
   AmountOrderDto,
   ConfirmOrderDto,
   CreateOrderDto,
@@ -120,5 +121,38 @@ export class OrderController {
   @Delete('/:id')
   async deleteOrder(@Param('id') idOrder: string) {
     return await this.orderService.deleteOrder(parseInt(idOrder));
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('/closing')
+  async createClosing(
+    @Body() addClosingDto: AddClosingDto,
+    @Req() request: Request,
+  ) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    const result = await this.orderService.addClosingOrder(
+      addClosingDto,
+      request.user as User,
+    );
+    return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('/confirm-closing/:id')
+  async confirmClosing(@Req() request: Request, @Param('id') idOrder: string) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.orderService.confirmClosing(parseInt(idOrder));
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete('/closing/:id')
+  async deleteClosing(@Param('id') idClosing: string) {
+    return await this.orderService.deleteClosing(parseInt(idClosing));
   }
 }

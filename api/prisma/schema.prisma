@@ -35,6 +35,7 @@ model User {
   switchProduct   SwitchProduct[]
   cart         Cart[]
   order        Order[]
+  closing        Closing[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -51,6 +52,7 @@ model Product {
    aromaBaru      String
    stock          Int
    codeProduct    String
+   closing        Closing[]
    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
    userId         Int    
    cart           Cart[]
@@ -98,4 +100,20 @@ model Order {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model Closing {
+   id              Int      @id @default(autoincrement()) @map("_id")
+   noOrder         String
+   customerName    String
+   orderDate       DateTime   @db.Date()
+   isConfirm       Boolean
+   totalPrice      String
+   qty             Int
+   productId       Int   
+   product         Product     @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+   userId          Int   
+   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+   createdAt       DateTime @default(now())
+   updatedAt       DateTime @updatedAt
 }

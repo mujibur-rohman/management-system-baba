@@ -591,12 +591,6 @@ export class ProductService {
         throw new NotFoundException('Produk member tidak ditemukan');
       }
 
-      if (availableMemberNewProduct.stock < confirmSwitchProductDto.qty) {
-        throw new BadRequestException(
-          `Aroma ${availableMemberNewProduct.aromaLama}/${availableMemberNewProduct.aromaBaru} tidak bisa ditukar dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableMemberNewProduct.stock}`,
-        );
-      }
-
       await this.prisma.product.update({
         where: {
           id: availableMemberNewProduct.id,
@@ -740,5 +734,27 @@ export class ProductService {
     } else {
       throw new BadRequestException('type must be self or team');
     }
+  }
+
+  async deleteSwitch(id: number) {
+    const availableSwitch = await this.prisma.switchProduct.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!availableSwitch) {
+      throw new NotFoundException('Data tidak ditemukan');
+    }
+
+    await this.prisma.switchProduct.delete({
+      where: {
+        id: availableSwitch.id,
+      },
+    });
+
+    return {
+      message: 'Data berhasil dihapus!',
+    };
   }
 }

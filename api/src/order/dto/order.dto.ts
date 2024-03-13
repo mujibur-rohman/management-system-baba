@@ -47,3 +47,17 @@ export class ConfirmOrderDto {
   @IsOptional()
   memberUserId: number;
 }
+
+export class AddClosingDto {
+  @IsNotEmpty({ message: 'Customer name is required.' })
+  customerName: string;
+
+  @IsNotEmpty({ message: 'Total price is required.' })
+  totalPrice: string;
+
+  @IsNotEmpty({ message: 'Quantity is required.' })
+  qty: number;
+
+  @IsNotEmpty({ message: 'Product Id is required.' })
+  productId: number;
+}

@@ -6,6 +6,7 @@ import {
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 import {
+  AddClosingDto,
   AmountOrderDto,
   ConfirmOrderDto,
   CreateOrderDto,
@@ -482,5 +483,108 @@ export class OrderService {
     });
 
     return { message: `Order berhasil dihapus` };
+  }
+
+  async addClosingOrder(addClosingDto: AddClosingDto, userData: User) {
+    const noOrder = randomAlphanumeric.generate({
+      capitalization: 'uppercase',
+      charset: 'alphanumeric',
+      length: 10,
+    });
+
+    const date = ('0' + new Date().getDate()).slice(-2);
+    const currentMonth = new Date().getMonth() + 1;
+    const mo = ('0' + currentMonth).slice(-2);
+    const currentYear = new Date().getFullYear();
+
+    const newClosing = await this.prisma.closing.create({
+      data: {
+        noOrder,
+        customerName: addClosingDto.customerName,
+        qty: addClosingDto.qty,
+        productId: addClosingDto.productId,
+        totalPrice: addClosingDto.totalPrice,
+        userId: userData.id,
+        isConfirm: false,
+        orderDate: new Date(`${currentYear}-${mo}-${date}`).toISOString(),
+      },
+    });
+
+    return {
+      message: 'Orderan sudah ditambahkan, silahkan konfirmasi',
+      data: newClosing,
+    };
+  }
+
+  async confirmClosing(id: number) {
+    const availableClosing = await this.prisma.closing.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!availableClosing) {
+      throw new NotFoundException('Closingan tidak ditemukan');
+    }
+
+    const availableProduct = await this.prisma.product.findFirst({
+      where: {
+        id: availableClosing.productId,
+      },
+    });
+
+    if (!availableProduct) {
+      throw new NotFoundException('Produk tidak ditemukan');
+    }
+
+    if (availableProduct.stock < availableClosing.qty) {
+      throw new BadRequestException('Stok tidak mencukupi');
+    }
+
+    // * confirm & denote stock
+
+    await this.prisma.closing.update({
+      where: {
+        id: availableClosing.id,
+      },
+      data: {
+        isConfirm: true,
+      },
+    });
+
+    await this.prisma.product.update({
+      where: {
+        id: availableProduct.id,
+      },
+      data: {
+        stock: availableProduct.stock - availableClosing.qty,
+      },
+    });
+
+    return {
+      message: 'Closingan berhasil dikonfirmasi!',
+    };
+  }
+
+  async deleteClosing(id: number) {
+    const availableClosing = await this.prisma.closing.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!availableClosing) {
+      throw new NotFoundException('Closingan tidak ditemukan');
+    }
+
+    await this.prisma.closing.delete({
+      where: {
+        id: availableClosing.id,
+      },
+    });
+
+    return {
+      message: 'Closingan berhasil dihapus!',
+    };
   }
 }

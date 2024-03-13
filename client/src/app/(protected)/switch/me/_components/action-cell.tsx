@@ -5,7 +5,7 @@ import useAuth from "@/hooks/useAuth";
 import ProductService from "@/services/product/product.service";
 import { SwitchType } from "@/services/product/switch.types";
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2Icon, Edit2Icon, Loader2Icon, MoreHorizontalIcon, TrashIcon } from "lucide-react";
+import { CheckCircle2Icon, Loader2Icon, MoreHorizontalIcon, TrashIcon } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
@@ -26,9 +26,9 @@ function ActionCellSwitch({ switchData, memberId }: { switchData: SwitchType; me
       setLoading(true);
       switch (typeAction) {
         case "delete":
-          //   const deleteResponse = await OrderService.deleteOrder(order.id);
-          //   queryClient.invalidateQueries();
-          //   toast.success(deleteResponse.message);
+          const deleteResponse = await ProductService.deleteSwitch(switchData.id);
+          queryClient.invalidateQueries();
+          toast.success(deleteResponse.message);
           break;
         case "confirm":
           const confirmResponse = await ProductService.confirmSwitch({
@@ -88,7 +88,7 @@ function ActionCellSwitch({ switchData, memberId }: { switchData: SwitchType; me
               <Button variant="secondary" size="sm" onClick={() => setOpenDialog(false)}>
                 Batal
               </Button>
-              <Button disabled={isLoading} variant="destructive" size="sm">
+              <Button disabled={isLoading} onClick={handleConfirm} variant="destructive" size="sm">
                 {isLoading ? <Loader2Icon className="animate-spin" /> : "Yakin"}
               </Button>
             </DialogFooter>
@@ -124,15 +124,6 @@ function ActionCellSwitch({ switchData, memberId }: { switchData: SwitchType; me
                   <CheckCircle2Icon className="w-4 h-4 text-foreground" /> Konfirmasi
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem
-                onClick={() => {
-                  setOpenDialog(true);
-                  setTypeAction("edit");
-                }}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <Edit2Icon className="w-4 h-4 text-foreground" /> Ubah Jumlah
-              </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex items-center gap-2 cursor-pointer"
                 onClick={() => {

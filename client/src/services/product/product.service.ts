@@ -51,6 +51,10 @@ const ProductService = {
     });
     return res.data;
   },
+  deleteSwitch: async (id: number) => {
+    const res = await axiosInitialize.delete<{ message: string }>(`${PRODUCT_PATHNAME}/switch/delete/${id}`);
+    return res.data;
+  },
   addToCart: async (payload: { qty: number; productId: number; price: string }) => {
     const res = await axiosInitialize.post<{ message: string }>(`${PRODUCT_PATHNAME}/cart`, payload);
     return res.data;

@@ -222,4 +222,10 @@ export class ProductController {
       type: type as 'self' | 'team',
     });
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete('/switch/delete/:id')
+  async deleteSwitch(@Param('id') id: string) {
+    return await this.productService.deleteSwitch(parseInt(id));
+  }
 }
