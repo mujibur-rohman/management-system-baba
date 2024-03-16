@@ -485,6 +485,78 @@ export class OrderService {
     return { message: `Order berhasil dihapus` };
   }
 
+  async getClosing({
+    limit,
+    page,
+    userData,
+    q,
+    userId,
+    month,
+    year,
+  }: {
+    page: number;
+    limit: number;
+    userData: User;
+    q: string;
+    year: string;
+    month: string;
+    userId?: number;
+  }) {
+    if (!year || !month) {
+      throw new BadRequestException('year and month params required');
+    }
+    const lastDayOfMonth = new Date(
+      parseInt(year),
+      parseInt(month),
+      0,
+    ).getDate();
+
+    const offset = limit * page - limit;
+
+    const totalRows = await this.prisma.closing.count({
+      where: {
+        userId: userId || userData.id,
+        noOrder: {
+          contains: q,
+        },
+        orderDate: {
+          lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
+          gte: new Date(`${year}-${month}-01`),
+        },
+      },
+    });
+
+    const totalPage = Math.ceil(totalRows / limit);
+    const closing = await this.prisma.closing.findMany({
+      where: {
+        userId: userId || userData.id,
+        noOrder: {
+          contains: q,
+        },
+        orderDate: {
+          lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
+          gte: new Date(`${year}-${month}-01`),
+        },
+      },
+      include: {
+        product: true,
+      },
+      skip: offset,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return {
+      page,
+      limit,
+      totalRows,
+      totalPage,
+      data: closing,
+    };
+  }
+
   async addClosingOrder(addClosingDto: AddClosingDto, userData: User) {
     const noOrder = randomAlphanumeric.generate({
       capitalization: 'uppercase',

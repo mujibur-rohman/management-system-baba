@@ -1,6 +1,17 @@
 "use client";
 
-import { ArchiveRestoreIcon, ArrowLeftRightIcon, HomeIcon, MoreHorizontalIcon, Package2Icon, PackageIcon, ShoppingCartIcon, User2Icon, WalletIcon } from "lucide-react";
+import {
+  ArchiveRestoreIcon,
+  ArrowLeftRightIcon,
+  HandshakeIcon,
+  HomeIcon,
+  MoreHorizontalIcon,
+  Package2Icon,
+  PackageIcon,
+  ShoppingCartIcon,
+  User2Icon,
+  WalletIcon,
+} from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
@@ -102,6 +113,15 @@ function MenuItem({ pathname }: { pathname: string }) {
       >
         <Package2Icon />
         <span className="text-xs">Produk</span>
+      </Link>
+      <Link
+        href="/closing"
+        className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
+          "bg-blue-500 text-white": pathname === "/closing",
+        })}
+      >
+        <HandshakeIcon />
+        <span className="text-xs">Closingan</span>
       </Link>
       <Link
         href="/product"

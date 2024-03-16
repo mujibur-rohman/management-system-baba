@@ -141,6 +141,32 @@ export class OrderController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @Get('/closing')
+  async getClosing(
+    @Req() request: Request,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('q') q: string = '',
+    @Query('year') year: string,
+    @Query('month') month: string,
+    @Query('userId') userId?: string,
+  ) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.orderService.getClosing({
+      limit: limit * 1,
+      page: page * 1,
+      userData: request.user as any,
+      q,
+      userId: parseInt(userId),
+      year,
+      month,
+    });
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Post('/confirm-closing/:id')
   async confirmClosing(@Req() request: Request, @Param('id') idOrder: string) {
     if (!request.user) {
