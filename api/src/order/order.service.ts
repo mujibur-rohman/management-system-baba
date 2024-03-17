@@ -138,12 +138,6 @@ export class OrderService {
       },
     });
 
-    const userSeller = await this.prisma.user.findFirst({
-      where: {
-        id: availableOrder.sellerId,
-      },
-    });
-
     const cartData: Cart[] = JSON.parse(availableOrder.cartData);
 
     const countQty = cartData.reduce((accumulator, currentValue) => {
@@ -165,6 +159,8 @@ export class OrderService {
       },
     });
 
+    //* reseller to distributor/ress-up
+
     if (
       !['supplier', 'distributor', 'reseller-nc'].includes(userBuyer.role) &&
       countQty >= 200 &&
@@ -172,6 +168,17 @@ export class OrderService {
       new Date(availableOrder.orderDate).toLocaleDateString() ===
         new Date().toLocaleDateString()
     ) {
+      const userSeller = await this.prisma.user.findFirst({
+        where: {
+          id: availableOrder.sellerId,
+        },
+      });
+
+      const date = ('0' + new Date().getDate()).slice(-2);
+      const currentMonth = new Date().getMonth() + 1;
+      const mo = ('0' + currentMonth).slice(-2);
+      const currentYear = new Date().getFullYear();
+
       if (countMember >= 10) {
         await this.prisma.user.update({
           where: {
@@ -182,6 +189,17 @@ export class OrderService {
             parentId: userSeller.parentId ? userSeller.parentId : userSeller.id,
           },
         });
+        // * update history promoted
+        await this.prisma.promotion.create({
+          data: {
+            from: userBuyer.role,
+            to: 'distributor',
+            promotionDate: new Date(
+              `${currentYear}-${mo}-${date}`,
+            ).toISOString(),
+            userId: userBuyer.id,
+          },
+        });
       } else {
         await this.prisma.user.update({
           where: {
@@ -190,6 +208,48 @@ export class OrderService {
           data: {
             role: 'reseller-up',
             parentId: userSeller.parentId ? userSeller.parentId : userSeller.id,
+          },
+        });
+        // * update history promoted
+        await this.prisma.promotion.create({
+          data: {
+            from: userBuyer.role,
+            to: 'reseller-up',
+            promotionDate: new Date(
+              `${currentYear}-${mo}-${date}`,
+            ).toISOString(),
+            userId: userBuyer.id,
+          },
+        });
+      }
+
+      const titipanMember = await this.prisma.user.count({
+        where: {
+          AND: [
+            {
+              leaderSignedId: userBuyer.id,
+            },
+            {
+              role: 'reseller',
+            },
+          ],
+        },
+      });
+
+      if (titipanMember) {
+        await this.prisma.user.updateMany({
+          where: {
+            AND: [
+              {
+                leaderSignedId: userBuyer.id,
+              },
+              {
+                role: 'reseller',
+              },
+            ],
+          },
+          data: {
+            parentId: userBuyer.id,
           },
         });
       }

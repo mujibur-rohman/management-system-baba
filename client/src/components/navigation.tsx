@@ -106,15 +106,6 @@ function MenuItem({ pathname }: { pathname: string }) {
         <span className="text-xs">Tukar Aroma</span>
       </Link>
       <Link
-        href="/product"
-        className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
-          "bg-blue-500 text-white": pathname === "/product",
-        })}
-      >
-        <Package2Icon />
-        <span className="text-xs">Produk</span>
-      </Link>
-      <Link
         href="/closing"
         className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
           "bg-blue-500 text-white": pathname === "/closing",
@@ -124,9 +115,9 @@ function MenuItem({ pathname }: { pathname: string }) {
         <span className="text-xs">Closingan</span>
       </Link>
       <Link
-        href="/product"
+        href="/jadwal"
         className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
-          "bg-blue-500 text-white": pathname === "/product",
+          "bg-blue-500 text-white": pathname === "/jadwal",
         })}
       >
         <Package2Icon />

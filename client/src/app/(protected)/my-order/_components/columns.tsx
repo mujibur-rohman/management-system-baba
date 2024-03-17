@@ -15,10 +15,19 @@ export const columns: ColumnDef<OrderTypes>[] = [
     },
   },
   {
-    accessorKey: "tglOrder",
-    header: "Tanggal Order",
+    accessorKey: "date",
+    header: "Tanggal",
     cell: ({ row }) => {
       return moment(row.original.orderDate).format("LL");
+    },
+  },
+  {
+    accessorKey: "time",
+    header: "Jam",
+    cell: ({ row }) => {
+      const hours = new Date(row.original.createdAt).getHours().toString().padStart(2, "0");
+      const minutes = new Date(row.original.createdAt).getMinutes().toString().padStart(2, "0");
+      return `${hours}:${minutes}`;
     },
   },
   {

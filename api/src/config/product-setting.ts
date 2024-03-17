@@ -1,4 +1,5 @@
 const PRODUCT_DATA = [
+  ['X-MOOD', 'X-MOOD', 'XX00'],
   ['BACARAT', 'TOP 501', 'BT01'],
   ['RUBI RAINER', 'RUBI RAINER', 'RR02'],
   ['MEVA', 'MEVA', 'MM03'],

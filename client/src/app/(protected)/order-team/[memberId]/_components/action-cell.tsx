@@ -26,8 +26,6 @@ function ActionCelOrderTeam({ order }: { order: OrderTypes }) {
     setOpenDialog(value);
   };
 
-  console.log(order);
-
   const handleConfirm = async () => {
     try {
       setLoading(true);

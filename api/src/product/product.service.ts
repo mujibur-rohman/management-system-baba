@@ -531,15 +531,6 @@ export class ProductService {
         throw new NotFoundException('Produk leader tidak ditemukan');
       }
 
-      await this.prisma.product.update({
-        where: {
-          id: availableParentOldProduct.id,
-        },
-        data: {
-          stock: availableParentOldProduct.stock + confirmSwitchProductDto.qty,
-        },
-      });
-
       const availableParentNewProduct = await this.prisma.product.findFirst({
         where: {
           AND: [
@@ -563,15 +554,6 @@ export class ProductService {
         );
       }
 
-      await this.prisma.product.update({
-        where: {
-          id: availableParentNewProduct.id,
-        },
-        data: {
-          stock: availableParentNewProduct.stock - confirmSwitchProductDto.qty,
-        },
-      });
-
       // * proses member product switch
 
       const availableMemberNewProduct = await this.prisma.product.findFirst({
@@ -590,15 +572,6 @@ export class ProductService {
       if (!availableMemberNewProduct) {
         throw new NotFoundException('Produk member tidak ditemukan');
       }
-
-      await this.prisma.product.update({
-        where: {
-          id: availableMemberNewProduct.id,
-        },
-        data: {
-          stock: availableMemberNewProduct.stock + confirmSwitchProductDto.qty,
-        },
-      });
 
       const availableMemberOldProduct = await this.prisma.product.findFirst({
         where: {
@@ -622,6 +595,33 @@ export class ProductService {
           `Aroma ${availableMemberOldProduct.aromaLama}/${availableMemberOldProduct.aromaBaru} tidak bisa ditukan dengan jumlah ${confirmSwitchProductDto.qty}, karena sisa stok ${availableMemberOldProduct.stock}`,
         );
       }
+
+      await this.prisma.product.update({
+        where: {
+          id: availableParentOldProduct.id,
+        },
+        data: {
+          stock: availableParentOldProduct.stock + confirmSwitchProductDto.qty,
+        },
+      });
+
+      await this.prisma.product.update({
+        where: {
+          id: availableParentNewProduct.id,
+        },
+        data: {
+          stock: availableParentNewProduct.stock - confirmSwitchProductDto.qty,
+        },
+      });
+
+      await this.prisma.product.update({
+        where: {
+          id: availableMemberNewProduct.id,
+        },
+        data: {
+          stock: availableMemberNewProduct.stock + confirmSwitchProductDto.qty,
+        },
+      });
 
       await this.prisma.product.update({
         where: {

@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import "moment/locale/id";
 import ActionCellMyOrder from "./action-cell";
 import { Badge } from "@/components/ui/badge";
+import moment from "moment";
 
 export const columns: ColumnDef<OrderTypes>[] = [
   {
@@ -11,6 +12,22 @@ export const columns: ColumnDef<OrderTypes>[] = [
     header: "Nomor Order",
     cell: ({ row }) => {
       return row.original.noOrder;
+    },
+  },
+  {
+    accessorKey: "date",
+    header: "Tanggal",
+    cell: ({ row }) => {
+      return moment(row.original.orderDate).format("LL");
+    },
+  },
+  {
+    accessorKey: "time",
+    header: "Jam",
+    cell: ({ row }) => {
+      const hours = new Date(row.original.createdAt).getHours().toString().padStart(2, "0");
+      const minutes = new Date(row.original.createdAt).getMinutes().toString().padStart(2, "0");
+      return `${hours}:${minutes}`;
     },
   },
   {
