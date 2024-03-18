@@ -18,4 +18,6 @@ export const validMimeType: ValidMimeType[] = [
   'image/png',
 ];
 
+export const FEE = '1500';
+
 export const AVATAR_PATH = '/img/avatar';

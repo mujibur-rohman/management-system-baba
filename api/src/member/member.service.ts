@@ -99,12 +99,16 @@ export class MemberService {
     q,
     userData,
     type = 'table',
+    month,
+    year,
   }: {
     q: string;
     page: number;
     limit: number;
     userData: { user: User };
-    type?: 'hierarchy' | 'table';
+    type?: 'hierarchy' | 'table' | 'table-sign';
+    year?: string;
+    month?: string;
   }) {
     if (type === 'table') {
       const offset = limit * page - limit;
@@ -160,8 +164,69 @@ export class MemberService {
         data: topLevelMembers,
         haha: this.totalMemberGlobal,
       };
+    } else if (type === 'table-sign') {
+      const offset = limit * page - limit;
+
+      const totalRows = await this.prisma.user.count({
+        where: {
+          leaderSignedId: userData.user.id,
+          name: {
+            contains: q,
+          },
+        },
+      });
+
+      const totalPage = Math.ceil(totalRows / limit);
+
+      const lastDayOfMonth = new Date(
+        parseInt(year),
+        parseInt(month),
+        0,
+      ).getDate();
+
+      const members = await this.prisma.user.findMany({
+        where: {
+          leaderSignedId: userData.user.id,
+          name: {
+            contains: q,
+          },
+        },
+        skip: offset,
+        take: limit,
+        select: {
+          id: true,
+          avatar: true,
+          idMember: true,
+          name: true,
+          parentId: true,
+          joinDate: true,
+          role: true,
+          fee: year &&
+            month && {
+              where: {
+                feeDate: {
+                  lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
+                  gte: new Date(`${year}-${month}-01`),
+                },
+              },
+            },
+        },
+        orderBy: {
+          name: 'asc',
+        },
+      });
+
+      return {
+        page,
+        limit,
+        totalRows,
+        totalPage,
+        data: members,
+      };
     } else {
-      throw new BadRequestException('type must be hierarchy or table');
+      throw new BadRequestException(
+        'type must be hierarchy or table or table-sign',
+      );
     }
   }
 

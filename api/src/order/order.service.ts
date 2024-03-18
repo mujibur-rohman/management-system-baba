@@ -14,6 +14,7 @@ import {
 } from './dto/order.dto';
 import { ProductService } from 'src/product/product.service';
 import { Cart, User } from '@prisma/client';
+import { FEE } from 'src/config/file-config';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const randomAlphanumeric = require('randomstring');
@@ -353,6 +354,15 @@ export class OrderService {
     userData: User;
     confimOrderDto: ConfirmOrderDto;
   }) {
+    const order = await this.prisma.order.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!order) {
+      throw new BadRequestException('order not found');
+    }
     // * check apakah stok tersedia
     if (!confimOrderDto.memberUserId) {
       const processTopLevel = confimOrderDto.cart.map(async (cart) => {
@@ -392,6 +402,88 @@ export class OrderService {
       });
       await Promise.all(processTopLevel);
     } else {
+      // * calculate fee
+      const userBuyer = await this.prisma.user.findFirst({
+        where: {
+          id: confimOrderDto.memberUserId,
+        },
+      });
+
+      const userLead = await this.prisma.user.findFirst({
+        where: {
+          id: userBuyer.leaderSignedId,
+        },
+      });
+
+      if (userLead && userBuyer && userBuyer.leaderSignedId !== userData.id) {
+        // * jika rolenya sama maka akan dapat fee
+        const date = ('0' + new Date().getDate()).slice(-2);
+        const currentMonth = new Date().getMonth() + 1;
+        const mo = ('0' + currentMonth).slice(-2);
+        const currentYear = new Date().getFullYear();
+        if (
+          userBuyer.role === userLead.role ||
+          (userBuyer.role === 'distributor' &&
+            userLead.role === 'reseller-up') ||
+          (userBuyer.role === 'reseller-up' && userLead.role === 'distributor')
+        ) {
+          const totalQty = confimOrderDto.cart.reduce(
+            (accumulator, currentValue) => {
+              return accumulator + currentValue.qty * 1;
+            },
+            0,
+          );
+          await this.prisma.fee.create({
+            data: {
+              fee: (parseInt(FEE) * totalQty).toString(),
+              orderId: order.id,
+              userId: userBuyer.leaderSignedId,
+              feeDate: new Date(`${currentYear}-${mo}-${date}`),
+            },
+          });
+        } else {
+          //* jika tidak sama maka akan di cek apakah sudah lebih dari 3 bulan
+          const promotion = await this.prisma.promotion.findFirst({
+            where: {
+              AND: [
+                {
+                  from: userLead.role,
+                },
+                {
+                  userId: userBuyer.id,
+                },
+              ],
+            },
+          });
+
+          const currentDate = new Date();
+          currentDate.setMonth(currentDate.getMonth() - 3);
+          currentDate.setHours(0, 0, 0, 0);
+          const threeMonthsAgoTimestamp = currentDate.getTime();
+
+          if (
+            promotion &&
+            new Date(promotion.promotionDate).getTime() >
+              threeMonthsAgoTimestamp
+          ) {
+            const totalQty = confimOrderDto.cart.reduce(
+              (accumulator, currentValue) => {
+                return accumulator + currentValue.qty * 1;
+              },
+              0,
+            );
+
+            await this.prisma.fee.create({
+              data: {
+                fee: (parseInt(FEE) * totalQty).toString(),
+                orderId: order.id,
+                userId: userBuyer.leaderSignedId,
+                feeDate: new Date(`${currentYear}-${mo}-${date}`),
+              },
+            });
+          }
+        }
+      }
       // * check stock parent
       const checkStock = confimOrderDto.cart.map(async (cart) => {
         try {
@@ -495,16 +587,6 @@ export class OrderService {
         }
       });
       await Promise.all(addStockMember);
-    }
-
-    const order = await this.prisma.order.findFirst({
-      where: {
-        id,
-      },
-    });
-
-    if (!order) {
-      throw new BadRequestException('order not found');
     }
 
     if (order.isConfirm) {
@@ -717,6 +799,76 @@ export class OrderService {
 
     return {
       message: 'Closingan berhasil dihapus!',
+    };
+  }
+
+  async getFees({
+    limit,
+    page,
+    userData,
+    userId,
+    month,
+    year,
+  }: {
+    page: number;
+    limit: number;
+    userData: User;
+    year: string;
+    month: string;
+    userId?: number;
+  }) {
+    if (!year || !month) {
+      throw new BadRequestException('year and month params required');
+    }
+    const lastDayOfMonth = new Date(
+      parseInt(year),
+      parseInt(month),
+      0,
+    ).getDate();
+
+    const offset = limit * page - limit;
+
+    const totalRows = await this.prisma.fee.count({
+      where: {
+        userId: userId || userData.id,
+        feeDate: {
+          lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
+          gte: new Date(`${year}-${month}-01`),
+        },
+      },
+    });
+
+    const totalPage = Math.ceil(totalRows / limit);
+    const fees = await this.prisma.fee.findMany({
+      where: {
+        userId: userId || userData.id,
+        feeDate: {
+          lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
+          gte: new Date(`${year}-${month}-01`),
+        },
+      },
+      include: {
+        order: true,
+      },
+      skip: offset,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const totalFee = fees.reduce(
+      (total, order) => total + parseInt(order.fee),
+      0,
+    );
+
+    return {
+      page,
+      limit,
+      totalRows,
+      totalPage,
+      data: fees,
+      totalFee,
     };
   }
 }

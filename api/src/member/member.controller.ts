@@ -27,6 +27,8 @@ export class MemberController {
     @Query('limit') limit: number = 10,
     @Query('q') q: string = '',
     @Query('type') type: string = 'table',
+    @Query('year') year?: string,
+    @Query('month') month?: string,
   ) {
     if (!request.user) {
       throw new UnauthorizedException();
@@ -37,7 +39,9 @@ export class MemberController {
       page: page * 1,
       q,
       userData: request as any,
-      type: type as 'hierarchy' | 'table',
+      type: type as 'hierarchy' | 'table' | 'table-sign',
+      month,
+      year,
     });
   }
 

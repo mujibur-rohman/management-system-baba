@@ -1,5 +1,6 @@
 import axiosInitialize from "@/config/axios.config";
 import { PaginationInterface } from "@/interface/pagination";
+import FeeTypes from "./fee.types";
 
 export const ORDER_PATHNAME = "/order";
 
@@ -23,6 +24,18 @@ const OrderService = {
         limit,
         page,
         q,
+        userId,
+        month,
+        year,
+      },
+    });
+    return res.data;
+  },
+  getFees: async ({ limit = 10, page = 1, userId, month, year }: { limit?: number; page: number; userId?: string; year: string; month: string }) => {
+    const res = await axiosInitialize.get<PaginationInterface<FeeTypes>>(`${ORDER_PATHNAME}/fee`, {
+      params: {
+        limit,
+        page,
         userId,
         month,
         year,

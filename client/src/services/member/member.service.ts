@@ -1,16 +1,33 @@
 import axiosInitialize from "@/config/axios.config";
 import { PaginationInterface } from "@/interface/pagination";
+import MemberTypesProfile from "./member.type";
 
 export const MEMBER_PATHNAME = "/member";
 
 const MemberService = {
-  getMyMember: async ({ limit = 10, page = 1, q = "", type = "table" }: { limit?: number; page: number; q: string; type: "table" | "hierarchy" }) => {
+  getMyMember: async ({
+    limit = 10,
+    page = 1,
+    q = "",
+    type = "table",
+    month,
+    year,
+  }: {
+    limit?: number;
+    page: number;
+    q: string;
+    type: "table" | "hierarchy" | "table-sign";
+    year?: string;
+    month?: string;
+  }) => {
     const res = await axiosInitialize.get<PaginationInterface<MemberTypesProfile>>(MEMBER_PATHNAME, {
       params: {
         limit,
         page,
         q,
         type,
+        month,
+        year,
       },
     });
     return res.data;

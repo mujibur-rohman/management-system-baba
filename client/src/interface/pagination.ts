@@ -5,5 +5,6 @@ export interface PaginationInterface<T> {
   totalPage: number;
   totalStock?: number;
   remainingAmount?: number;
+  totalFee?: number;
   data: T[];
 }

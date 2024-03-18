@@ -32,7 +32,6 @@ function ActionCellOrder({
   const openChangeWrapper = (value: boolean) => {
     setOpenDialog(value);
   };
-
   const price = auth?.user?.role as keyof typeof PRICE_MEMBER;
 
   const handleConfirm = async () => {

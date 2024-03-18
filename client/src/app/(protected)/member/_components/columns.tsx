@@ -6,6 +6,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
 import "moment/locale/id";
 import ActionCell from "./action-cell";
+import MemberTypesProfile from "@/services/member/member.type";
 
 export const columns: ColumnDef<MemberTypesProfile>[] = [
   {

@@ -3,6 +3,7 @@
 import {
   ArchiveRestoreIcon,
   ArrowLeftRightIcon,
+  HandCoinsIcon,
   HandshakeIcon,
   HomeIcon,
   MoreHorizontalIcon,
@@ -86,7 +87,7 @@ function MenuItem({ pathname }: { pathname: string }) {
 
       <Link href="/order-team" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
         <ArchiveRestoreIcon />
-        <span className="text-xs">Orderan Tim</span>
+        <span className="text-xs whitespace-nowrap">Orderan Tim</span>
       </Link>
       <Link
         href="/my-order"
@@ -103,7 +104,7 @@ function MenuItem({ pathname }: { pathname: string }) {
       </Link>
       <Link href="/switch" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
         <ArrowLeftRightIcon />
-        <span className="text-xs">Tukar Aroma</span>
+        <span className="text-xs whitespace-nowrap">Tukar Aroma</span>
       </Link>
       <Link
         href="/closing"
@@ -114,7 +115,7 @@ function MenuItem({ pathname }: { pathname: string }) {
         <HandshakeIcon />
         <span className="text-xs">Closingan</span>
       </Link>
-      <Link
+      {/* <Link
         href="/jadwal"
         className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
           "bg-blue-500 text-white": pathname === "/jadwal",
@@ -122,6 +123,15 @@ function MenuItem({ pathname }: { pathname: string }) {
       >
         <Package2Icon />
         <span className="text-xs">Jadwal</span>
+      </Link> */}
+      <Link
+        href="/fee"
+        className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
+          "bg-blue-500 text-white": pathname === "/fee",
+        })}
+      >
+        <HandCoinsIcon />
+        <span className="text-xs">Fee</span>
       </Link>
     </div>
   );

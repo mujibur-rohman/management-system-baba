@@ -1,3 +1,5 @@
+import FeeTypes from "../order/fee.types";
+
 type MemberTypesProfile = {
   id: number;
   avatar: {
@@ -10,4 +12,7 @@ type MemberTypesProfile = {
   role: string;
   joinDate: Date;
   children: MemberTypesProfile[];
+  fee: FeeTypes[];
 };
+
+export default MemberTypesProfile;

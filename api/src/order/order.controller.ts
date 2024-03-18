@@ -181,4 +181,28 @@ export class OrderController {
   async deleteClosing(@Param('id') idClosing: string) {
     return await this.orderService.deleteClosing(parseInt(idClosing));
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('/fee')
+  async getFees(
+    @Req() request: Request,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('year') year: string,
+    @Query('month') month: string,
+    @Query('userId') userId?: string,
+  ) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.orderService.getFees({
+      limit: limit * 1,
+      page: page * 1,
+      userData: request.user as any,
+      userId: parseInt(userId),
+      year,
+      month,
+    });
+  }
 }

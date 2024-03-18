@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PaginationInterface } from "@/interface/pagination";
 import { cn } from "@/lib/utils";
 import { STATUS_MEMBER } from "@/services/auth/auth.types";
+import MemberTypesProfile from "@/services/member/member.type";
 import React from "react";
 
 function Hierarchy({ members }: { members: PaginationInterface<MemberTypesProfile> | undefined }) {
