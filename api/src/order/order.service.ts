@@ -106,16 +106,14 @@ export class OrderService {
       where: {
         id: idOrder,
       },
+      include: {
+        user: true,
+      },
     });
 
     if (!availableOrder) {
       throw new NotFoundException('Orderan tidak ditemukan');
     }
-
-    console.log(
-      new Date(availableOrder.orderDate).toLocaleDateString() ===
-        new Date().toLocaleDateString(),
-    );
 
     const updatedOrder = await this.prisma.order.update({
       where: {

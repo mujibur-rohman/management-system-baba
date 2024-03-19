@@ -38,10 +38,6 @@ function AmountForm({ order, setDialog }: { order: OrderTypes; setDialog: React.
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log({
-        ...values,
-        remainingAmount: (parseInt(order.remainingAmount) - parseInt(values.amountCash) - parseInt(values.amountTrf)).toString(),
-      });
       const res = await OrderService.amountOrder({
         id: order.id,
         payload: {
@@ -83,6 +79,7 @@ function AmountForm({ order, setDialog }: { order: OrderTypes; setDialog: React.
                     <Input
                       type="number"
                       placeholder="Rp."
+                      autoComplete="off"
                       {...field}
                       className={cn({
                         "border-destructive outline-destructive !ring-destructive": (form.formState.errors as any).limit,
@@ -103,6 +100,7 @@ function AmountForm({ order, setDialog }: { order: OrderTypes; setDialog: React.
                     <Input
                       type="number"
                       placeholder="Rp."
+                      autoComplete="off"
                       {...field}
                       className={cn({
                         "border-destructive outline-destructive !ring-destructive": (form.formState.errors as any).limit,

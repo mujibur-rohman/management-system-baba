@@ -5,6 +5,7 @@ import "moment/locale/id";
 import ActionCellMyOrder from "./action-cell";
 import { Badge } from "@/components/ui/badge";
 import moment from "moment";
+import formatCurrency from "@/lib/format-currency";
 
 export const columns: ColumnDef<OrderTypes>[] = [
   {
@@ -52,28 +53,28 @@ export const columns: ColumnDef<OrderTypes>[] = [
     accessorKey: "totalPrice",
     header: "Wajib Bayar",
     cell: ({ row }) => {
-      return row.original.totalPrice;
+      return formatCurrency(parseInt(row.original.totalPrice));
     },
   },
   {
     accessorKey: "bayarCash",
     header: "Cash",
     cell: ({ row }) => {
-      return row.original.amountCash;
+      return formatCurrency(parseInt(row.original.amountCash));
     },
   },
   {
     accessorKey: "bayarTf",
     header: "Transfer",
     cell: ({ row }) => {
-      return row.original.amountTrf;
+      return formatCurrency(parseInt(row.original.amountTrf));
     },
   },
   {
     accessorKey: "remainingAmount",
     header: "Hutang",
     cell: ({ row }) => {
-      return row.original.remainingAmount;
+      return formatCurrency(parseInt(row.original.remainingAmount));
     },
   },
   {
