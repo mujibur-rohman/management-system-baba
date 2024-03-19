@@ -26,7 +26,7 @@ export const columns: ColumnDef<ClosingType>[] = [
     accessorKey: "date",
     header: "Tanggal",
     cell: ({ row }) => {
-      return moment(row.original.orderDate).format("LL");
+      return <span className="whitespace-nowrap">{moment(row.original.orderDate).format("LL")}</span>;
     },
   },
   {

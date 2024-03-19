@@ -57,6 +57,7 @@ function AddClosing() {
 
   const openChangeWrapper = (value: boolean) => {
     setOpenDialog(value);
+    form.reset();
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {

@@ -4,7 +4,7 @@ import Navbar from "@/components/navbar";
 import Navigation from "@/components/navigation";
 
 export const metadata: Metadata = {
-  title: "Baba Sistem",
+  title: "ERP - Baba",
 };
 
 export default function ManagementLayout({ children }: { children: React.ReactNode }) {

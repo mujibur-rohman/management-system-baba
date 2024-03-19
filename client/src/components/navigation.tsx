@@ -80,14 +80,14 @@ function MenuItem({ pathname }: { pathname: string }) {
             "bg-blue-500 text-white": pathname === "/member",
           })}
         >
-          <User2Icon />
-          <span className="text-xs">Member</span>
+          <User2Icon className="w-5 h-5 md:w-6 md:h-6" />
+          <span className="text-[10px] md:text-xs">Member</span>
         </Link>
       )}
 
       <Link href="/order-team" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
-        <ArchiveRestoreIcon />
-        <span className="text-xs whitespace-nowrap">Orderan Tim</span>
+        <ArchiveRestoreIcon className="w-5 h-5 md:w-6 md:h-6" />
+        <span className="text-[10px] md:text-xs whitespace-nowrap">Orderan Tim</span>
       </Link>
       <Link
         href="/my-order"
@@ -95,16 +95,16 @@ function MenuItem({ pathname }: { pathname: string }) {
           "bg-blue-500 text-white": pathname === "/my-order",
         })}
       >
-        <PackageIcon />
-        <span className="text-xs whitespace-nowrap">Orderan Saya</span>
+        <PackageIcon className="w-5 h-5 md:w-6 md:h-6" />
+        <span className="text-[10px] md:text-xs whitespace-nowrap">Orderan Saya</span>
       </Link>
-      <Link href="/" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
-        <WalletIcon />
-        <span className="text-xs">Keuangan</span>
+      <Link href="/profit" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
+        <WalletIcon className="w-5 h-5 md:w-6 md:h-6" />
+        <span className="text-[10px] md:text-xs">Profit</span>
       </Link>
       <Link href="/switch" className="p-2 gap-1 rounded-lg flex flex-col justify-center items-center hover:bg-foreground/20">
-        <ArrowLeftRightIcon />
-        <span className="text-xs whitespace-nowrap">Tukar Aroma</span>
+        <ArrowLeftRightIcon className="w-5 h-5 md:w-6 md:h-6" />
+        <span className="text-[10px] md:text-xs whitespace-nowrap">Tukar Aroma</span>
       </Link>
       <Link
         href="/closing"
@@ -112,8 +112,8 @@ function MenuItem({ pathname }: { pathname: string }) {
           "bg-blue-500 text-white": pathname === "/closing",
         })}
       >
-        <HandshakeIcon />
-        <span className="text-xs">Closingan</span>
+        <HandshakeIcon className="w-5 h-5 md:w-6 md:h-6" />
+        <span className="text-[10px] md:text-xs">Closingan</span>
       </Link>
       {/* <Link
         href="/jadwal"
@@ -121,8 +121,8 @@ function MenuItem({ pathname }: { pathname: string }) {
           "bg-blue-500 text-white": pathname === "/jadwal",
         })}
       >
-        <Package2Icon />
-        <span className="text-xs">Jadwal</span>
+        <Package2Icon className="w-5 h-5 md:w-6 md:h-6" />
+        <span className="text-[10px] md:text-xs">Jadwal</span>
       </Link> */}
       <Link
         href="/fee"
@@ -130,8 +130,8 @@ function MenuItem({ pathname }: { pathname: string }) {
           "bg-blue-500 text-white": pathname === "/fee",
         })}
       >
-        <HandCoinsIcon />
-        <span className="text-xs">Fee</span>
+        <HandCoinsIcon className="w-5 h-5 md:w-6 md:h-6" />
+        <span className="text-[10px] md:text-xs">Fee</span>
       </Link>
     </div>
   );

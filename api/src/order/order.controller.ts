@@ -173,7 +173,10 @@ export class OrderController {
       throw new UnauthorizedException();
     }
 
-    return await this.orderService.confirmClosing(parseInt(idOrder));
+    return await this.orderService.confirmClosing(
+      parseInt(idOrder),
+      request.user as any,
+    );
   }
 
   @UseGuards(AccessTokenGuard)
@@ -201,6 +204,28 @@ export class OrderController {
       page: page * 1,
       userData: request.user as any,
       userId: parseInt(userId),
+      year,
+      month,
+    });
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('/profit')
+  async getProfits(
+    @Req() request: Request,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('year') year: string,
+    @Query('month') month: string,
+  ) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.orderService.getProfit({
+      limit: limit * 1,
+      page: page * 1,
+      userData: request.user as any,
       year,
       month,
     });

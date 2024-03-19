@@ -14,7 +14,8 @@ import {
 } from './dto/order.dto';
 import { ProductService } from 'src/product/product.service';
 import { Cart, User } from '@prisma/client';
-import { FEE } from 'src/config/file-config';
+import { FEE, PRICE_MEMBER } from 'src/config/file-config';
+import renderRole from 'src/utils/render-role';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const randomAlphanumeric = require('randomstring');
@@ -363,6 +364,16 @@ export class OrderService {
     if (!order) {
       throw new BadRequestException('order not found');
     }
+
+    const date = ('0' + new Date().getDate()).slice(-2);
+    const currentMonth = new Date().getMonth() + 1;
+    const mo = ('0' + currentMonth).slice(-2);
+    const currentYear = new Date().getFullYear();
+
+    const countQty = confimOrderDto.cart.reduce((accumulator, currentValue) => {
+      return accumulator + currentValue.qty * 1;
+    }, 0);
+
     // * check apakah stok tersedia
     if (!confimOrderDto.memberUserId) {
       const processTopLevel = confimOrderDto.cart.map(async (cart) => {
@@ -401,6 +412,16 @@ export class OrderService {
         }
       });
       await Promise.all(processTopLevel);
+      await this.prisma.income.create({
+        data: {
+          incomeDate: new Date(`${currentYear}-${mo}-${date}`).toISOString(),
+          type: 'outcome',
+          value: order.totalPrice,
+          remarks: 'Order',
+          userId: userData.id,
+          qty: countQty,
+        },
+      });
     } else {
       // * calculate fee
       const userBuyer = await this.prisma.user.findFirst({
@@ -587,6 +608,34 @@ export class OrderService {
         }
       });
       await Promise.all(addStockMember);
+
+      const modal = parseInt(PRICE_MEMBER[userData.role]) * countQty;
+      const income = parseInt(order.totalPrice) - modal;
+
+      // * process income & outcome member
+      await this.prisma.income.create({
+        data: {
+          incomeDate: new Date(`${currentYear}-${mo}-${date}`).toISOString(),
+          type: 'income',
+          value: income.toString(),
+          modal: modal.toString(),
+          remarks: renderRole(userBuyer.role),
+          userId: userData.id,
+          name: userBuyer.name,
+          qty: countQty,
+        },
+      });
+
+      await this.prisma.income.create({
+        data: {
+          incomeDate: new Date(`${currentYear}-${mo}-${date}`).toISOString(),
+          type: 'outcome',
+          value: order.totalPrice,
+          remarks: 'Order',
+          userId: userBuyer.id,
+          qty: countQty,
+        },
+      });
     }
 
     if (order.isConfirm) {
@@ -730,7 +779,7 @@ export class OrderService {
     };
   }
 
-  async confirmClosing(id: number) {
+  async confirmClosing(id: number, userData: User) {
     const availableClosing = await this.prisma.closing.findFirst({
       where: {
         id,
@@ -772,6 +821,28 @@ export class OrderService {
       },
       data: {
         stock: availableProduct.stock - availableClosing.qty,
+      },
+    });
+
+    const modal = parseInt(PRICE_MEMBER[userData.role]) * availableClosing.qty;
+    const income = parseInt(availableClosing.totalPrice) - modal;
+
+    const date = ('0' + new Date().getDate()).slice(-2);
+    const currentMonth = new Date().getMonth() + 1;
+    const mo = ('0' + currentMonth).slice(-2);
+    const currentYear = new Date().getFullYear();
+
+    // * process income
+    await this.prisma.income.create({
+      data: {
+        incomeDate: new Date(`${currentYear}-${mo}-${date}`).toISOString(),
+        type: 'income',
+        value: income.toString(),
+        modal: modal.toString(),
+        remarks: 'Customer',
+        userId: userData.id,
+        name: availableClosing.customerName,
+        qty: availableClosing.qty,
       },
     });
 
@@ -869,6 +940,84 @@ export class OrderService {
       totalPage,
       data: fees,
       totalFee,
+    };
+  }
+
+  async getProfit({
+    limit,
+    page,
+    userData,
+    month,
+    year,
+  }: {
+    page: number;
+    limit: number;
+    userData: User;
+    year: string;
+    month: string;
+  }) {
+    if (!year || !month) {
+      throw new BadRequestException('year and month params required');
+    }
+    const lastDayOfMonth = new Date(
+      parseInt(year),
+      parseInt(month),
+      0,
+    ).getDate();
+
+    const offset = limit * page - limit;
+
+    const totalRows = await this.prisma.income.count({
+      where: {
+        userId: userData.id,
+        incomeDate: {
+          lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
+          gte: new Date(`${year}-${month}-01`),
+        },
+      },
+    });
+
+    const totalPage = Math.ceil(totalRows / limit);
+    const profit = await this.prisma.income.findMany({
+      where: {
+        userId: userData.id,
+        incomeDate: {
+          lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
+          gte: new Date(`${year}-${month}-01`),
+        },
+      },
+      skip: offset,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const incomes = profit.filter((prof) => prof.type === 'income');
+    const outcomes = profit.filter((prof) => prof.type === 'outcome');
+
+    const totalIncome = incomes.reduce(
+      (total, inc) => total + parseInt(inc.value),
+      0,
+    );
+    const totalOutcome = outcomes.reduce(
+      (total, inc) => total + parseInt(inc.value),
+      0,
+    );
+    const totalQtyIncome = incomes.reduce((total, inc) => total + inc.qty, 0);
+    const totalQtyOutcome = outcomes.reduce((total, inc) => total + inc.qty, 0);
+
+    return {
+      page,
+      limit,
+      totalRows,
+      totalPage,
+      data: profit,
+      totalIncome,
+      totalOutcome,
+      totalQtyIncome,
+      totalQtyOutcome,
+      totalProfit: totalIncome - totalOutcome,
     };
   }
 }

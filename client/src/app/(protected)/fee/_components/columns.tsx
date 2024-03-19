@@ -17,7 +17,7 @@ export const columns: ColumnDef<FeeTypes>[] = [
     accessorKey: "date",
     header: "Tanggal",
     cell: ({ row }) => {
-      return moment(row.original.feeDate).format("LL");
+      return <span className="whitespace-nowrap">{moment(row.original.feeDate).format("LL")}</span>;
     },
   },
   {

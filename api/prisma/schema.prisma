@@ -35,6 +35,7 @@ model User {
   switchProduct   SwitchProduct[]
   cart         Cart[]
   order        Order[]
+  income        Income[]
   fee        Fee[]
   promotion        Promotion[]
   closing        Closing[]
@@ -120,6 +121,21 @@ model Fee {
    order           Order     @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
    fee             String
    feeDate         DateTime   @db.Date()
+   userId          Int   
+   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+   createdAt       DateTime @default(now())
+   updatedAt       DateTime @updatedAt
+}
+
+model Income{
+   id              Int      @id @default(autoincrement()) @map("_id")
+   name            String?
+   qty             Int?
+   modal           String?
+   value           String
+   type            String
+   remarks         String 
+   incomeDate      DateTime   @db.Date()
    userId          Int   
    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
    createdAt       DateTime @default(now())

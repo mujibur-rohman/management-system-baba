@@ -43,6 +43,17 @@ const OrderService = {
     });
     return res.data;
   },
+  getProfit: async ({ limit = 10, page = 1, month, year }: { limit?: number; page: number; year: string; month: string }) => {
+    const res = await axiosInitialize.get<PaginationInterface<ProfitType>>(`${ORDER_PATHNAME}/profit`, {
+      params: {
+        limit,
+        page,
+        month,
+        year,
+      },
+    });
+    return res.data;
+  },
   addClosing: async (payload: any) => {
     const res = await axiosInitialize.post<{
       message: string;

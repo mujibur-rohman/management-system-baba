@@ -6,5 +6,10 @@ export interface PaginationInterface<T> {
   totalStock?: number;
   remainingAmount?: number;
   totalFee?: number;
+  totalIncome?: number;
+  totalOutcome?: number;
+  totalProfit?: number;
+  totalQtyIncome?: number;
+  totalQtyOutcome?: number;
   data: T[];
 }
