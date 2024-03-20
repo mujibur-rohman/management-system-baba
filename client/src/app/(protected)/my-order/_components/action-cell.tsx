@@ -188,17 +188,15 @@ function ActionCellMyOrder({ order }: { order: OrderTypes }) {
             </>
           ) : (
             <>
-              {auth?.user?.parentId ? null : (
-                <DropdownMenuItem
-                  onClick={() => {
-                    setOpenDialog(true);
-                    setTypeAction("amount");
-                  }}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <Wallet2Icon className="w-4 h-4 text-foreground" /> Pembayaran
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem
+                onClick={() => {
+                  setOpenDialog(true);
+                  setTypeAction("amount");
+                }}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Wallet2Icon className="w-4 h-4 text-foreground" /> Pembayaran
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
                   setOpenDialog(true);

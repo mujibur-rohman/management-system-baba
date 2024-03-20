@@ -15,10 +15,11 @@ import { OrderService } from './order.service';
 import { AccessTokenGuard } from 'src/guards/access-token.guard';
 import {
   AddClosingDto,
-  AmountOrderDto,
   ConfirmOrderDto,
   CreateOrderDto,
   EditOrderDto,
+  EditPaymentOrderDto,
+  PaymentOrderDto,
 } from './dto/order.dto';
 import { Request } from 'express';
 import { User } from '@prisma/client';
@@ -60,15 +61,8 @@ export class OrderController {
 
   @UseGuards(AccessTokenGuard)
   @Put('/amount/:id')
-  async amountOrder(
-    @Body() amountDto: AmountOrderDto,
-    @Param('id') idOrder: string,
-  ) {
-    console.log(idOrder);
-    const result = await this.orderService.amountOrder(
-      parseInt(idOrder),
-      amountDto,
-    );
+  async amountOrder(@Param('id') idPayment: string) {
+    const result = await this.orderService.amountOrder(parseInt(idPayment));
 
     return result;
   }
@@ -229,5 +223,66 @@ export class OrderController {
       year,
       month,
     });
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('/payment')
+  async getPayments(
+    @Req() request: Request,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('year') year: string,
+    @Query('month') month: string,
+    @Query('userId') userId?: string,
+  ) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.orderService.getPayment({
+      limit: limit * 1,
+      page: page * 1,
+      userData: request.user as any,
+      userId: parseInt(userId),
+      year,
+      month,
+    });
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('/payment')
+  async createPayment(
+    @Body() paymentOrderDto: PaymentOrderDto,
+    @Req() request: Request,
+  ) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+
+    const result = await this.orderService.createPayment(
+      paymentOrderDto,
+      request.user as User,
+    );
+    return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Put('/payment/:id')
+  async updatePayment(
+    @Body() editPayment: EditPaymentOrderDto,
+    @Param('id') idPayment: string,
+  ) {
+    const result = await this.orderService.editPayment(
+      editPayment,
+      parseInt(idPayment),
+    );
+
+    return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete('/payment/:id')
+  async deletePayment(@Param('id') idOrder: string) {
+    return await this.orderService.deletePayment(parseInt(idOrder));
   }
 }

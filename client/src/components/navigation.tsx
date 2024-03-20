@@ -3,6 +3,7 @@
 import {
   ArchiveRestoreIcon,
   ArrowLeftRightIcon,
+  BanknoteIcon,
   HandCoinsIcon,
   HandshakeIcon,
   HomeIcon,
@@ -132,6 +133,15 @@ function MenuItem({ pathname }: { pathname: string }) {
       >
         <HandCoinsIcon className="w-5 h-5 md:w-6 md:h-6" />
         <span className="text-[10px] md:text-xs">Fee</span>
+      </Link>
+      <Link
+        href="/payment"
+        className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {
+          "bg-blue-500 text-white": pathname === "/payment",
+        })}
+      >
+        <BanknoteIcon className="w-5 h-5 md:w-6 md:h-6" />
+        <span className="text-[10px] md:text-xs">Payment</span>
       </Link>
     </div>
   );

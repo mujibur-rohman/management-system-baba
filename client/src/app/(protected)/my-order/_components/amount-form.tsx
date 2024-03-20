@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import formatCurrency from "@/lib/format-currency";
 import { cn } from "@/lib/utils";
 import OrderService from "@/services/order/order.service";
+import PaymentType from "@/services/order/payment.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
@@ -13,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-function AmountForm({ order, setDialog }: { order: OrderTypes; setDialog: React.Dispatch<React.SetStateAction<boolean>> }) {
+function AmountForm({ order, setDialog, payment }: { payment?: PaymentType; order: OrderTypes; setDialog: React.Dispatch<React.SetStateAction<boolean>> }) {
   const queryClient = useQueryClient();
 
   const formSchema = z
@@ -29,29 +30,32 @@ function AmountForm({ order, setDialog }: { order: OrderTypes; setDialog: React.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amountCash: "",
-      amountTrf: "",
+      amountCash: payment?.amountCash ? payment.amountCash : "",
+      amountTrf: payment?.amountTrf ? payment.amountTrf : "",
     },
   });
 
-  console.log(form.getValues());
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const res = await OrderService.amountOrder({
-        id: order.id,
-        payload: {
+      if (!payment) {
+        const res = await OrderService.addPayment({
+          idOrder: order.id,
           amountCash: values.amountCash ? values.amountCash : "0",
           amountTrf: values.amountTrf ? values.amountTrf : "0",
-          remainingAmount: (
-            parseInt(order.remainingAmount) -
-            parseInt(values.amountCash ? values.amountCash : "0") -
-            parseInt(values.amountTrf ? values.amountTrf : "0")
-          ).toString(),
-        },
-      });
+        });
 
-      toast.success(res.message);
+        toast.success(res.message);
+      } else {
+        const res = await OrderService.editPayment(
+          {
+            amountCash: values.amountCash ? values.amountCash : "0",
+            amountTrf: values.amountTrf ? values.amountTrf : "0",
+          },
+          payment.id
+        );
+
+        toast.success(res.message);
+      }
       setDialog(false);
       queryClient.invalidateQueries();
     } catch (error: any) {

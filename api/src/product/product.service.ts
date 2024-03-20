@@ -454,6 +454,20 @@ export class ProductService {
     userData: User,
     confirmSwitchProductDto: ConfirmSwitchProductDto,
   ) {
+    const switchProduct = await this.prisma.switchProduct.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!switchProduct) {
+      throw new BadRequestException('switch product not found');
+    }
+
+    if (switchProduct.isConfirm) {
+      throw new BadRequestException('Penukaran sudah terkonfirmasi');
+    }
+
     if (!confirmSwitchProductDto.memberId) {
       const availableOldProduct = await this.prisma.product.findFirst({
         where: {
@@ -631,20 +645,6 @@ export class ProductService {
           stock: availableMemberOldProduct.stock - confirmSwitchProductDto.qty,
         },
       });
-    }
-
-    const switchProduct = await this.prisma.switchProduct.findFirst({
-      where: {
-        id,
-      },
-    });
-
-    if (!switchProduct) {
-      throw new BadRequestException('switch product not found');
-    }
-
-    if (switchProduct.isConfirm) {
-      throw new BadRequestException('sudah terkonfirmasi');
     }
 
     await this.prisma.switchProduct.update({

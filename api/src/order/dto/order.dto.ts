@@ -40,6 +40,24 @@ export class AmountOrderDto {
   remainingAmount: string;
 }
 
+export class PaymentOrderDto {
+  @IsOptional()
+  amountCash: string;
+
+  @IsOptional()
+  amountTrf: string;
+
+  @IsNotEmpty({ message: 'id order is required.' })
+  idOrder: number;
+}
+export class EditPaymentOrderDto {
+  @IsOptional()
+  amountCash: string;
+
+  @IsOptional()
+  amountTrf: string;
+}
+
 export class ConfirmOrderDto {
   @IsNotEmpty({ message: 'Cart is required.' })
   cart: Cart[];

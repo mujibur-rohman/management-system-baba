@@ -7,10 +7,11 @@ import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 import {
   AddClosingDto,
-  AmountOrderDto,
   ConfirmOrderDto,
   CreateOrderDto,
   EditOrderDto,
+  EditPaymentOrderDto,
+  PaymentOrderDto,
 } from './dto/order.dto';
 import { ProductService } from 'src/product/product.service';
 import { Cart, User } from '@prisma/client';
@@ -101,10 +102,20 @@ export class OrderService {
     };
   }
 
-  async amountOrder(idOrder: number, amountDto: AmountOrderDto) {
+  async amountOrder(idPayment: number) {
+    const availablePayment = await this.prisma.payment.findFirst({
+      where: {
+        id: idPayment,
+      },
+    });
+
+    if (!availablePayment) {
+      throw new NotFoundException('Payment tidak ditemukan');
+    }
+
     const availableOrder = await this.prisma.order.findFirst({
       where: {
-        id: idOrder,
+        id: availablePayment.orderId,
       },
       include: {
         user: true,
@@ -115,19 +126,42 @@ export class OrderService {
       throw new NotFoundException('Orderan tidak ditemukan');
     }
 
+    if (availablePayment.isConfirm) {
+      throw new BadRequestException('Pembayaran sudah dikonfirmasi');
+    }
+
     const updatedOrder = await this.prisma.order.update({
       where: {
         id: availableOrder.id,
       },
       data: {
-        remainingAmount: amountDto.remainingAmount,
+        remainingAmount: (
+          parseInt(availableOrder.remainingAmount) -
+          parseInt(
+            availablePayment.amountCash ? availablePayment.amountCash : '0',
+          ) -
+          parseInt(
+            availablePayment.amountTrf ? availablePayment.amountTrf : '0',
+          )
+        ).toString(),
         amountCash: (
-          parseInt(availableOrder.amountCash) + parseInt(amountDto.amountCash)
+          parseInt(availableOrder.amountCash) +
+          parseInt(availablePayment.amountCash)
         ).toString(),
         amountTrf: (
-          parseInt(availableOrder.amountTrf) + parseInt(amountDto.amountTrf)
+          parseInt(availableOrder.amountTrf) +
+          parseInt(availablePayment.amountTrf)
         ).toString(),
         cartData: availableOrder.cartData,
+      },
+    });
+
+    await this.prisma.payment.update({
+      where: {
+        id: availablePayment.id,
+      },
+      data: {
+        isConfirm: true,
       },
     });
 
@@ -256,7 +290,7 @@ export class OrderService {
     }
 
     return {
-      message: 'Pembayaran di update!',
+      message: 'Pembayaran brhasil dikonfirmasi!',
     };
   }
 
@@ -361,6 +395,10 @@ export class OrderService {
 
     if (!order) {
       throw new BadRequestException('order not found');
+    }
+
+    if (order.isConfirm) {
+      throw new BadRequestException('Orderan sudah dikonfirmasi');
     }
 
     const date = ('0' + new Date().getDate()).slice(-2);
@@ -788,6 +826,10 @@ export class OrderService {
       throw new NotFoundException('Closingan tidak ditemukan');
     }
 
+    if (availableClosing.isConfirm) {
+      throw new BadRequestException('Closingan sudah dikonfirmasi');
+    }
+
     const availableProduct = await this.prisma.product.findFirst({
       where: {
         id: availableClosing.productId,
@@ -1017,5 +1059,147 @@ export class OrderService {
       totalQtyOutcome,
       totalProfit: totalIncome - totalOutcome,
     };
+  }
+
+  async createPayment(paymentOrderDto: PaymentOrderDto, userData: User) {
+    const date = ('0' + new Date().getDate()).slice(-2);
+    const currentMonth = new Date().getMonth() + 1;
+    const mo = ('0' + currentMonth).slice(-2);
+    const currentYear = new Date().getFullYear();
+
+    const availableOrder = await this.prisma.order.findFirst({
+      where: {
+        id: paymentOrderDto.idOrder,
+      },
+    });
+
+    if (!availableOrder) {
+      throw new NotFoundException('Orderan tidak ditemukan');
+    }
+
+    await this.prisma.payment.create({
+      data: {
+        amountCash: paymentOrderDto.amountCash || null,
+        amountTrf: paymentOrderDto.amountTrf || null,
+        userId: userData.id,
+        isConfirm: false,
+        paymentDate: new Date(`${currentYear}-${mo}-${date}`).toISOString(),
+        orderId: availableOrder.id,
+      },
+    });
+
+    return {
+      message: 'Pembayaran berhasil, silahkan minta konfirmasi',
+    };
+  }
+
+  async editPayment(paymentOrderDto: EditPaymentOrderDto, idPayment: number) {
+    const availablePayment = await this.prisma.payment.findFirst({
+      where: {
+        id: idPayment,
+      },
+    });
+
+    if (!availablePayment) {
+      throw new NotFoundException('Payment tidak ditemukan');
+    }
+
+    await this.prisma.payment.update({
+      where: {
+        id: availablePayment.id,
+      },
+      data: {
+        amountCash: paymentOrderDto.amountCash,
+        amountTrf: paymentOrderDto.amountTrf,
+      },
+    });
+
+    return {
+      message: 'Pembayaran berhasil diubah, silahkan minta konfirmasi',
+    };
+  }
+
+  async getPayment({
+    limit,
+    page,
+    userData,
+    userId,
+    month,
+    year,
+  }: {
+    page: number;
+    limit: number;
+    userData: User;
+    year: string;
+    month: string;
+    userId?: number;
+  }) {
+    if (!year || !month) {
+      throw new BadRequestException('year and month params required');
+    }
+    const lastDayOfMonth = new Date(
+      parseInt(year),
+      parseInt(month),
+      0,
+    ).getDate();
+
+    const offset = limit * page - limit;
+
+    const totalRows = await this.prisma.payment.count({
+      where: {
+        userId: userId || userData.id,
+        paymentDate: {
+          lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
+          gte: new Date(`${year}-${month}-01`),
+        },
+      },
+    });
+
+    const totalPage = Math.ceil(totalRows / limit);
+    const payments = await this.prisma.payment.findMany({
+      where: {
+        userId: userId || userData.id,
+        paymentDate: {
+          lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
+          gte: new Date(`${year}-${month}-01`),
+        },
+      },
+      include: {
+        order: true,
+      },
+      skip: offset,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return {
+      page,
+      limit,
+      totalRows,
+      totalPage,
+      data: payments,
+    };
+  }
+
+  async deletePayment(id: number) {
+    const payment = await this.prisma.payment.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!payment) {
+      throw new BadRequestException('payment not found');
+    }
+
+    await this.prisma.payment.delete({
+      where: {
+        id: payment.id,
+      },
+    });
+
+    return { message: `Payment berhasil dihapus` };
   }
 }

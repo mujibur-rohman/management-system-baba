@@ -1,6 +1,7 @@
 import axiosInitialize from "@/config/axios.config";
 import { PaginationInterface } from "@/interface/pagination";
 import FeeTypes from "./fee.types";
+import PaymentType from "./payment.types";
 
 export const ORDER_PATHNAME = "/order";
 
@@ -74,10 +75,10 @@ const OrderService = {
     }>(`${ORDER_PATHNAME}/${id}`, payload);
     return res.data;
   },
-  amountOrder: async ({ id, payload }: { id: number; payload: any }) => {
+  amountOrder: async (id: number) => {
     const res = await axiosInitialize.put<{
       message: string;
-    }>(`${ORDER_PATHNAME}/amount/${id}`, payload);
+    }>(`${ORDER_PATHNAME}/amount/${id}`);
     return res.data;
   },
   confirmOrder: async ({ id, payload }: { id: number; payload: any }) => {
@@ -102,6 +103,36 @@ const OrderService = {
     const res = await axiosInitialize.delete<{
       message: string;
     }>(`${ORDER_PATHNAME}/closing/${id}`);
+    return res.data;
+  },
+  addPayment: async (payload: any) => {
+    const res = await axiosInitialize.post<{
+      message: string;
+    }>(`${ORDER_PATHNAME}/payment`, payload);
+    return res.data;
+  },
+  editPayment: async (payload: any, id: number) => {
+    const res = await axiosInitialize.put<{
+      message: string;
+    }>(`${ORDER_PATHNAME}/payment/${id}`, payload);
+    return res.data;
+  },
+  deletePayment: async (id: number) => {
+    const res = await axiosInitialize.delete<{
+      message: string;
+    }>(`${ORDER_PATHNAME}/payment/${id}`);
+    return res.data;
+  },
+  getPayment: async ({ limit = 10, page = 1, userId, month, year }: { limit?: number; page: number; userId?: string; year: string; month: string }) => {
+    const res = await axiosInitialize.get<PaginationInterface<PaymentType>>(`${ORDER_PATHNAME}/payment`, {
+      params: {
+        limit,
+        page,
+        userId,
+        month,
+        year,
+      },
+    });
     return res.data;
   },
 };
