@@ -27,7 +27,7 @@ function Navigation() {
 
   if (pathname === "/carts") return null;
   return (
-    <div className="fixed grid grid-cols-4 gap-3 bottom-0 right-0 left-0 bg-background border-border border p-2 rounded-t-lg">
+    <div className="fixed grid grid-cols-4 gap-3 z-20 bottom-0 right-0 left-0 bg-background border-border border p-2 rounded-t-lg">
       <Link
         href="/"
         className={cn("p-2 gap-1 rounded-lg transition-all flex flex-col justify-center items-center hover:bg-foreground/20", {

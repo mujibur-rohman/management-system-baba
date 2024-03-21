@@ -8,8 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import OrderService from "@/services/order/order.service";
 import { useQuery } from "@tanstack/react-query";
 import { RefreshCwIcon, Wallet2Icon } from "lucide-react";
-import React, { ChangeEvent, useState } from "react";
-import { Input } from "@/components/ui/input";
+import React, { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn, getCurrentMonth, getMonthsList, getYearsList } from "@/lib/utils";
 import { columns } from "./_components/columns";
@@ -56,7 +55,6 @@ function ProfitPage() {
               {formatCurrency(profits?.totalProfit || 0) || "..."}
             </span>
           </div>
-
           <Wallet2Icon />
         </div>
       </div>
