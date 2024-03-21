@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Cart, Order, User } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 
@@ -68,23 +68,60 @@ export class DashboardService {
   }
 
   async getTotalQtyOrder(userData: User) {
-    const currentMonth = new Date().getMonth() + 1;
-    const mo = ('0' + currentMonth).slice(-2);
-    const currentYear = new Date().getFullYear();
+    function calculateTotalQty(orders: Order[]) {
+      let totalQty = 0;
+      orders.forEach((order) => {
+        const cartData: Cart[] = JSON.parse(order.cartData);
+        cartData.forEach((item) => {
+          totalQty += parseInt(item.qty + '');
+        });
+      });
+      return totalQty;
+    }
 
-    const lastDayOfMonth = new Date(currentYear, parseInt(mo), 0).getDate();
+    const currentDate = new Date();
+    const result = [];
+    const value = [];
+    const monthKey = [];
 
-    const orders = await this.prisma.order.findMany({
-      where: {
-        sellerId: userData.id,
-        orderDate: {
-          lte: new Date(`${currentYear}-${mo}-${lastDayOfMonth}`),
-          gte: new Date(`${currentYear}-${mo}-01`),
+    for (let i = 0; i < 6; i++) {
+      const targetDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - i,
+        1,
+      );
+
+      const year = targetDate.getFullYear();
+      const month = targetDate.getMonth() + 1;
+      const lastDayOfMonth = new Date(year, month, 0).getDate();
+
+      const orders = await this.prisma.order.findMany({
+        where: {
+          sellerId: userData.id,
+          orderDate: {
+            lte: new Date(
+              `${year}-${month.toString().padStart(2, '0')}-${lastDayOfMonth}`,
+            ),
+            gte: new Date(`${year}-${month.toString().padStart(2, '0')}-01`),
+          },
         },
-      },
-    });
+      });
 
-    return orders;
+      const totalQty = calculateTotalQty(orders);
+
+      result.push({
+        totalQty,
+        month: MONTHS[month - 1],
+      });
+      monthKey.push(MONTHS[month - 1]);
+      value.push(totalQty);
+    }
+
+    return {
+      month: monthKey,
+      value,
+      data: result,
+    };
   }
 
   async getProfitSixMonth(userData: User) {
@@ -108,8 +145,10 @@ export class DashboardService {
         where: {
           userId: userData.id,
           incomeDate: {
-            lte: new Date(`${year}-${month}-${lastDayOfMonth}`),
-            gte: new Date(`${year}-${month}-01`),
+            lte: new Date(
+              `${year}-${month.toString().padStart(2, '0')}-${lastDayOfMonth}`,
+            ),
+            gte: new Date(`${year}-${month.toString().padStart(2, '0')}-01`),
           },
         },
       });
