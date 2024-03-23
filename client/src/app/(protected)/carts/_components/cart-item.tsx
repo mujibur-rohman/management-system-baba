@@ -38,8 +38,9 @@ function CartItem({
       setIsLoadingDel(true);
       if (!isClient) {
         const res = await ProductService.deleteCart(id);
-        toast.success(res.message);
         await queryClient.invalidateQueries({ queryKey: ["cart"] });
+        await queryClient.invalidateQueries();
+        toast.success(res.message);
       } else {
         delete quantities[cart._id];
       }
