@@ -62,7 +62,6 @@ function AddClosing() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log(values);
       const selectedProduct = myProduct?.find((prod) => prod.id === values.productId);
       const newClosing = await OrderService.addClosing({
         ...values,

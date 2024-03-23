@@ -192,15 +192,6 @@ function ActionCelOrderTeam({ order }: { order: OrderTypes }) {
               <DropdownMenuItem
                 onClick={() => {
                   setOpenDialog(true);
-                  setTypeAction("amount");
-                }}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <Wallet2Icon className="w-4 h-4 text-foreground" /> Pembayaran
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setOpenDialog(true);
                   setTypeAction("detail");
                 }}
                 className="flex items-center gap-2 cursor-pointer"

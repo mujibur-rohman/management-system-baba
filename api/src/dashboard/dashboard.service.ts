@@ -118,8 +118,8 @@ export class DashboardService {
     }
 
     return {
-      month: monthKey,
-      value,
+      month: monthKey.reverse(),
+      value: value.reverse(),
       data: result,
     };
   }
@@ -176,8 +176,8 @@ export class DashboardService {
     }
 
     return {
-      month: monthKey,
-      value,
+      month: monthKey.reverse(),
+      value: value.reverse(),
       data: result,
     };
   }

@@ -74,13 +74,13 @@ function ProfitPage() {
         <div className="p-3 rounded-md flex justify-between items-center border gap-5">
           <div className="flex flex-col">
             <span className="text-sm">Total Botol Keluar</span>
-            <span className={cn("text-emerald-500 font-bold text-xl")}>{profits?.totalQtyIncome || 0 || "..."}</span>
+            <span className={cn("text-emerald-500 font-bold text-xl")}>{profits?.totalQtyIncome || "0" || "..."}</span>
           </div>
         </div>
         <div className="p-3 rounded-md flex justify-between items-center border gap-5">
           <div className="flex flex-col">
             <span className="text-sm">Total Botol Masuk</span>
-            <span className={cn("text-pink-700 font-bold text-xl")}>{profits?.totalQtyOutcome || 0 || "..."}</span>
+            <span className={cn("text-pink-700 font-bold text-xl")}>{profits?.totalQtyOutcome || "0" || "..."}</span>
           </div>
         </div>
       </div>

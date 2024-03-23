@@ -27,8 +27,6 @@ function TeamSwitch() {
     },
   });
 
-  console.log(switches);
-
   //* handle change page
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

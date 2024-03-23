@@ -15,6 +15,7 @@ import {
   ResetPasswordDto,
 } from './dto/auth.dto';
 import STATUS_MEMBER from 'src/types/status-member';
+import PRODUCT_DATA from 'src/config/product-setting';
 
 @Injectable()
 export class AuthService {
@@ -58,10 +59,25 @@ export class AuthService {
         leaderSignedId,
       },
       select: {
+        id: true,
         name: true,
         idMember: true,
       },
     });
+
+    const mappingGenerate = PRODUCT_DATA.map(async (product) => {
+      await this.prisma.product.create({
+        data: {
+          userId: user.id,
+          aromaLama: product[0],
+          aromaBaru: product[1],
+          codeProduct: product[2],
+          stock: 0,
+        },
+      });
+    });
+
+    await Promise.all(mappingGenerate);
 
     return { user, message: 'Account has registered' };
   }

@@ -47,7 +47,6 @@ function UpdatePassword({ setOpen, isOpen }: { setOpen: React.Dispatch<React.Set
       toast.success("Password berhasil diubah");
       setOpen(false);
     } catch (error: any) {
-      console.log(error);
       if (error?.response?.data) {
         toast.error(error.response.data.message);
         return;
