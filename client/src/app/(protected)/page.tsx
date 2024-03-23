@@ -201,7 +201,7 @@ export default function Home() {
         <div className="p-3 rounded-md flex justify-between items-center border gap-5">
           <div className="flex flex-col">
             <span className="text-sm">Total Member</span>
-            <span className="text-lime-500 font-bold text-xl whitespace-nowrap">{countMember?.countMember ? countMember?.countMember + "" : "..."}</span>
+            <span className="text-lime-500 font-bold text-xl whitespace-nowrap">{countMemberLoading ? "..." : countMember?.countMember}</span>
           </div>
           <UsersIcon />
         </div>
@@ -222,7 +222,7 @@ export default function Home() {
         <div className="p-3 rounded-md flex justify-between items-center border gap-5">
           <div className="flex flex-col">
             <span className="text-sm">Stok</span>
-            <span className="text-destructive font-bold text-xl whitespace-nowrap">{countStock?.totalStock ? countStock?.totalStock + "" : "..."} botol</span>
+            <span className="text-destructive font-bold text-xl whitespace-nowrap">{countStockLoading ? "..." : countStock?.totalStock} botol</span>
           </div>
           <Package2Icon />
         </div>

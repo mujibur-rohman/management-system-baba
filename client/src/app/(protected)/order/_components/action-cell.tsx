@@ -39,7 +39,8 @@ function ActionCellOrder({
       if (value && value !== "0") {
         setLoading(true);
         const ordered = await ProductService.addToCart({ productId: id, qty: parseInt(value), price: PRICE_MEMBER[price] });
-        queryClient.invalidateQueries({ queryKey: ["cart", "order"] });
+        queryClient.invalidateQueries({ queryKey: ["cart"] });
+        await queryClient.invalidateQueries();
         toast.success(ordered.message);
         setLoading(false);
         setOpenDialog(false);

@@ -39,7 +39,7 @@ function CartItem({
       if (!isClient) {
         const res = await ProductService.deleteCart(id);
         toast.success(res.message);
-        queryClient.invalidateQueries({ queryKey: ["cart"] });
+        await queryClient.invalidateQueries({ queryKey: ["cart"] });
       } else {
         delete quantities[cart._id];
       }
