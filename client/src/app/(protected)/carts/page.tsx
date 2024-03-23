@@ -4,7 +4,6 @@ import AppWrapper from "@/components/app-wrapper";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProductService from "@/services/product/product.service";
 import { useQuery } from "@tanstack/react-query";
-import { TrashIcon } from "lucide-react";
 import React from "react";
 import CartList from "./_components/cart-list";
 
