@@ -35,7 +35,7 @@ function Navbar() {
       <AppWrapper>
         <div className="flex justify-between items-center h-14">
           <Link href="/" className="text-primary font-bold text-xl">
-            BABA
+            BABA PARFUM
           </Link>
           <div className="flex gap-4 items-center">
             <Link href="/carts" className="relative cursor-pointer">

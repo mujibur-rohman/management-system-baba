@@ -32,4 +32,19 @@ export const columns: ColumnDef<MemberTypesProfile>[] = [
       return totalFee || 0;
     },
   },
+  {
+    accessorKey: "jumlah",
+    header: "Jumlah Order",
+    cell: ({ row }) => {
+      const fees = row.original.fee?.reduce((total, order) => {
+        const jsonCart: Cart[] = JSON.parse(order.order.cartData);
+        const totalQty = jsonCart.reduce((accumulator, currentValue) => {
+          return accumulator + currentValue.qty * 1;
+        }, 0);
+        return total + totalQty;
+      }, 0);
+
+      return fees;
+    },
+  },
 ];

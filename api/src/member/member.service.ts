@@ -209,6 +209,9 @@ export class MemberService {
                   gte: new Date(`${year}-${month}-01`),
                 },
               },
+              include: {
+                order: true,
+              },
             },
         },
         orderBy: {

@@ -47,6 +47,8 @@ function FeeTeamPage() {
     setCurrentPage(1);
   };
 
+  console.log(members);
+
   return (
     <AppWrapper className="pb-20">
       <div className="py-5 flex justify-between">
