@@ -18,6 +18,7 @@ import { toast } from "sonner";
 function ProductPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoadingGenerate, setLoadingGenerate] = useState(false);
+  const [isLoadingUpdate, setLoadingUpdate] = useState(false);
   const [search, setSearch] = useState<string>("");
   const debouncedValue = useDebounce<string>(search, 300);
 
@@ -69,6 +70,16 @@ function ProductPage() {
     <AppWrapper className="pb-20">
       <div className="py-5 flex justify-between">
         <h1 className="text-xl md:text-2xl font-bold">Produk & Stok</h1>
+        <Button
+          variant="success"
+          disabled={isLoadingUpdate}
+          onClick={async () => {
+            await ProductService.update();
+            queryClient.invalidateQueries();
+          }}
+        >
+          {isLoadingUpdate ? "Loading.." : "Update Aroma"}
+        </Button>
       </div>
       <div className="my-3">
         <span className="text-xl font-medium">Total Semua Stok : {products?.totalStock}</span>

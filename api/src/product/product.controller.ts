@@ -37,6 +37,15 @@ export class ProductController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @Post('/update')
+  async updateProduct(@Req() request: Request) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+    return await this.productService.updateProduct(request.user as User);
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Get('/cart')
   async getCarts(@Req() request: Request) {
     if (!request.user) {

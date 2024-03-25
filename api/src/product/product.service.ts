@@ -82,6 +82,53 @@ export class ProductService {
     };
   }
 
+  async updateProduct(userData: User) {
+    const mappingGenerate = PRODUCT_DATA.map(async (product) => {
+      const availableProduct = await this.prisma.product.findFirst({
+        where: {
+          AND: [
+            {
+              userId: userData.id,
+            },
+            {
+              codeProduct: product[2],
+            },
+          ],
+        },
+      });
+
+      if (!availableProduct) {
+        await this.prisma.product.create({
+          data: {
+            userId: userData.id,
+            aromaLama: product[0],
+            aromaBaru: product[1],
+            codeProduct: product[2],
+            stock: 0,
+          },
+        });
+      } else {
+        await this.prisma.product.update({
+          where: {
+            id: availableProduct.id,
+          },
+          data: {
+            aromaLama: product[0],
+            aromaBaru: product[1],
+            codeProduct: product[2],
+            stock: availableProduct.stock,
+          },
+        });
+      }
+    });
+
+    await Promise.all(mappingGenerate);
+
+    return {
+      message: 'Data berhasil diupdate',
+    };
+  }
+
   async getProducts({
     limit,
     page,
