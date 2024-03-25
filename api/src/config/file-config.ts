@@ -1,7 +1,7 @@
 export type ValidImageExtension = 'png' | 'jpg' | 'jpeg';
 export type ValidMimeType = 'image/png' | 'image/jpg' | 'image/jpeg';
 
-export const MAX_IMAGE_SIZE: number = 2; // Mega Byte
+export const MAX_IMAGE_SIZE: number = 5; // Mega Byte
 
 export const validImageExtension: ValidImageExtension[] = [
   'jpeg',
