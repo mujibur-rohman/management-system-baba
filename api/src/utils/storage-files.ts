@@ -10,7 +10,7 @@ import {
 
 export const saveAvatarToStorage: MulterOptions = {
   storage: diskStorage({
-    destination: `./public${AVATAR_PATH}`,
+    destination: `./dist/public${AVATAR_PATH}`,
     filename: (req, file, cb) => {
       const randomNumber = Math.floor(Math.random() * 900000) + 100000;
       const fileName: string =

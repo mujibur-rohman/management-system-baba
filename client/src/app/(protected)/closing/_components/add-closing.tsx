@@ -26,7 +26,7 @@ const formSchema = z.object({
     }),
 });
 
-const topSeller = ["RR02", "2X07", "RR04", "BT01", "BB05", "2X06"];
+const topSeller = ["RR02", "RR04", "BT01", "BB05", "MM03", "XX00", "YO144"];
 
 function AddClosing() {
   const [isOpenDialog, setOpenDialog] = useState(false);

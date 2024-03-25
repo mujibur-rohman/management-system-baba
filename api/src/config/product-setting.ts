@@ -143,6 +143,7 @@ const PRODUCT_DATA = [
   ['ZARA LOVE', 'ZA LOVE', 'WW141'],
   ['ZARA MAN', 'ZA MAN', 'ZZ142'],
   ['ZARA WOMAN', 'ZA WOMEN', 'ZZ143'],
+  ['YSL BLACK OVIUM', 'OVIUM FRAGRANCE', 'YO144'],
 ];
 
 export default PRODUCT_DATA;
