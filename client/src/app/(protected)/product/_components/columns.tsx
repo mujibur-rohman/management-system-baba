@@ -6,17 +6,17 @@ import ActionCellProduct from "./action-cell";
 
 export const columns: ColumnDef<ProductTypes>[] = [
   {
-    accessorKey: "aromaLama",
-    header: "Aroma Lama",
-    cell: ({ row }) => {
-      return row.original.aromaLama;
-    },
-  },
-  {
     accessorKey: "aromaBaru",
     header: "Aroma Baru",
     cell: ({ row }) => {
       return row.original.aromaBaru;
+    },
+  },
+  {
+    accessorKey: "aromaLama",
+    header: "Aroma Lama",
+    cell: ({ row }) => {
+      return row.original.aromaLama;
     },
   },
   {

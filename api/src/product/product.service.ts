@@ -134,7 +134,7 @@ export class ProductService {
       skip: offset,
       take: limit * 1,
       orderBy: {
-        aromaLama: 'asc',
+        aromaBaru: 'asc',
       },
       include: {
         cart: true,
