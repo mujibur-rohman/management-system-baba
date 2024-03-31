@@ -82,6 +82,21 @@ export class ProductService {
     };
   }
 
+  async resetProduct(userData: User) {
+    await this.prisma.product.updateMany({
+      where: {
+        userId: userData.id,
+      },
+      data: {
+        stock: 0,
+      },
+    });
+
+    return {
+      message: 'Semua stok berhasil direset',
+    };
+  }
+
   async updateProduct(userData: User) {
     const mappingGenerate = PRODUCT_DATA.map(async (product) => {
       const availableProduct = await this.prisma.product.findFirst({

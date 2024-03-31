@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/useDebounce";
 import ProductService from "@/services/product/product.service";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon, RefreshCwIcon } from "lucide-react";
+import { CookingPotIcon, Loader2Icon, RefreshCwIcon, RotateCcwIcon } from "lucide-react";
 import React, { ChangeEvent, useState } from "react";
 import { columns } from "./_components/columns";
 import Paginate from "@/components/paginate";
@@ -17,6 +17,7 @@ import { toast } from "sonner";
 
 function ProductPage() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingReset, setLoadingReset] = useState(false);
   const [isLoadingGenerate, setLoadingGenerate] = useState(false);
   const [isLoadingUpdate, setLoadingUpdate] = useState(false);
   const [search, setSearch] = useState<string>("");
@@ -70,19 +71,33 @@ function ProductPage() {
     <AppWrapper className="pb-20">
       <div className="py-5 flex justify-between">
         <h1 className="text-xl md:text-2xl font-bold">Produk & Stok</h1>
-        <Button
-          variant="success"
-          disabled={isLoadingUpdate}
-          onClick={async () => {
-            await ProductService.update();
-            queryClient.invalidateQueries();
-          }}
-        >
-          {isLoadingUpdate ? "Loading.." : "Update Aroma"}
-        </Button>
       </div>
       <div className="my-3">
         <span className="text-xl font-medium">Total Semua Stok : {products?.totalStock}</span>
+      </div>
+      <div className="my-3 w-fit flex gap-3">
+        <div
+          onClick={async () => {
+            setLoadingReset(true);
+            await ProductService.reset();
+            queryClient.invalidateQueries();
+            setLoadingReset(false);
+          }}
+          className="p-1 rounded border-2 cursor-pointer border-destructive"
+        >
+          {isLoadingReset ? <CookingPotIcon className="text-destructive w-5 h-5 animate-spin" /> : <CookingPotIcon className="text-destructive w-5 h-5" />}
+        </div>
+        <div
+          onClick={async () => {
+            setLoadingUpdate(true);
+            await ProductService.update();
+            queryClient.invalidateQueries();
+            setLoadingUpdate(false);
+          }}
+          className="p-1 rounded border-2 cursor-pointer border-green-500"
+        >
+          {isLoadingUpdate ? <RotateCcwIcon className="text-green-500 w-5 h-5 animate-spin" /> : <RotateCcwIcon className="text-green-500 w-5 h-5" />}
+        </div>
       </div>
       <div className="border rounded-lg p-5">
         <div className="flex flex-col md:flex-row gap-3 mb-4 justify-between">

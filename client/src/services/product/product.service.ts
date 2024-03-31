@@ -73,6 +73,10 @@ const ProductService = {
     const res = await axiosInitialize.post<{ message: string }>(`${PRODUCT_PATHNAME}/update`);
     return res.data;
   },
+  reset: async () => {
+    const res = await axiosInitialize.put<{ message: string }>(`${PRODUCT_PATHNAME}/reset`);
+    return res.data;
+  },
   getCarts: async () => {
     const res = await axiosInitialize.get<{ data: Cart[] }>(`${PRODUCT_PATHNAME}/cart`);
     return res.data;

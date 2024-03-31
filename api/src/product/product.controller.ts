@@ -46,6 +46,15 @@ export class ProductController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @Put('/reset')
+  async resetProduct(@Req() request: Request) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+    return await this.productService.resetProduct(request.user as User);
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Get('/cart')
   async getCarts(@Req() request: Request) {
     if (!request.user) {
