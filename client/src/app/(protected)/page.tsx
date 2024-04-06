@@ -229,11 +229,11 @@ export default function Home() {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 mt-5 gap-3">
         <div className="border rounded-md p-6">
-          <span className="font-bold">Jumlah botol terjual 4 bulan terakhir</span>
+          <span className="font-bold">Jumlah botol terjual 6 bulan terakhir</span>
           <Chart options={orderedChart as ApexOptions} width={"100%"} series={orderedChart.series} type="bar" height={350} />
         </div>
         <div className="border rounded-md p-6">
-          <span className="font-bold">Profit 4 bulan terakhir</span>
+          <span className="font-bold">Profit 6 bulan terakhir</span>
           <Chart options={profitChart as ApexOptions} width={"100%"} series={profitChart.series} type="bar" height={350} />
         </div>
       </div>

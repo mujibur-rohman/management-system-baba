@@ -14,9 +14,11 @@ import { columns } from "./_components/columns";
 import Paginate from "@/components/paginate";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 function ProductPage() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [isOpenDialog, setOpenDialog] = useState(false);
   const [isLoadingReset, setLoadingReset] = useState(false);
   const [isLoadingGenerate, setLoadingGenerate] = useState(false);
   const [isLoadingUpdate, setLoadingUpdate] = useState(false);
@@ -37,6 +39,10 @@ function ProductPage() {
       return await ProductService.getAll({ limit: 10, page: currentPage, q: debouncedValue });
     },
   });
+
+  const openChangeWrapper = (value: boolean) => {
+    setOpenDialog(value);
+  };
 
   //* handle change page
   const handlePageChange = (page: number) => {
@@ -76,28 +82,51 @@ function ProductPage() {
         <span className="text-xl font-medium">Total Semua Stok : {products?.totalStock}</span>
       </div>
       <div className="my-3 w-fit flex gap-3">
-        <div
-          onClick={async () => {
-            setLoadingReset(true);
-            await ProductService.reset();
-            queryClient.invalidateQueries();
-            setLoadingReset(false);
-          }}
-          className="p-1 rounded border-2 cursor-pointer border-destructive"
-        >
-          {isLoadingReset ? <CookingPotIcon className="text-destructive w-5 h-5 animate-spin" /> : <CookingPotIcon className="text-destructive w-5 h-5" />}
-        </div>
-        <div
+        <Dialog open={isOpenDialog} onOpenChange={openChangeWrapper}>
+          <DialogTrigger asChild>
+            <Button variant="destructive" size="sm">
+              <CookingPotIcon className="w-5 h-5" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Reset Stok</DialogTitle>
+              <DialogDescription>Beneran mau kosongin stok?</DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex flex-col md:flex-row gap-3 md:gap-0">
+              <Button variant="secondary" size="sm" onClick={() => setOpenDialog(false)}>
+                Batal
+              </Button>
+              <Button
+                disabled={isLoadingReset}
+                onClick={async () => {
+                  setLoadingReset(true);
+                  await ProductService.reset();
+                  queryClient.invalidateQueries();
+                  setLoadingReset(false);
+                  setOpenDialog(false);
+                }}
+                variant="destructive"
+                size="sm"
+              >
+                {isLoadingReset ? <Loader2Icon className="animate-spin" /> : "Yakin"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Button
           onClick={async () => {
             setLoadingUpdate(true);
             await ProductService.update();
             queryClient.invalidateQueries();
             setLoadingUpdate(false);
           }}
-          className="p-1 rounded border-2 cursor-pointer border-green-500"
+          variant="success"
+          size="sm"
         >
-          {isLoadingUpdate ? <RotateCcwIcon className="text-green-500 w-5 h-5 animate-spin" /> : <RotateCcwIcon className="text-green-500 w-5 h-5" />}
-        </div>
+          {isLoadingUpdate ? <RotateCcwIcon className="w-5 h-5 animate-spin" /> : <RotateCcwIcon className="w-5 h-5" />}
+        </Button>
       </div>
       <div className="border rounded-lg p-5">
         <div className="flex flex-col md:flex-row gap-3 mb-4 justify-between">

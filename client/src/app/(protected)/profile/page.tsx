@@ -39,12 +39,12 @@ function ProfilePage() {
         <p className="text-foreground/50 text-center">{user?.user?.name}</p>
         <Badge variant="success">{user?.user?.role.toUpperCase()}</Badge>
       </div>
-      <div className=" mt-5">
+      {/* <div className=" mt-5">
         <div className="flex flex-col items-center gap-1">
           <span className="text-sm font-semibold">Total Member</span>
           <span className="text-xl font-bold">103</span>
         </div>
-      </div>
+      </div> */}
       <div className="p-3 border border-border mt-5 rounded flex flex-wrap gap-5 justify-center">
         <div className="flex flex-col items-center gap-1">
           <span className="text-xs font-semibold">Leader</span>
