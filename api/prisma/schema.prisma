@@ -38,6 +38,7 @@ model User {
   income        Income[]
   fee        Fee[]
   promotion        Promotion[]
+  todos        Todo[]
   payment        Payment[]
   closing        Closing[]
   createdAt    DateTime @default(now())
@@ -51,6 +52,15 @@ model Promotion {
   from     String
   to       String
   promotionDate  DateTime   @db.Date()
+}
+
+model Todo {
+  id       Int      @id @default(autoincrement()) @map("_id")
+  user     User     @relation(fields: [userId], references: [id],onDelete: Cascade, onUpdate: Cascade)
+  userId   Int      @unique
+  name     String
+  isCompleted       Boolean
+  targetDate  DateTime   @db.Date()
 }
 
 model UserProfile {

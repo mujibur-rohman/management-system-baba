@@ -12,6 +12,9 @@ export const columns: ColumnDef<MemberTypesProfile>[] = [
   {
     accessorKey: "idMember",
     header: "ID",
+    cell: ({ row }) => {
+      return <span className="whitespace-nowrap">{row.original.idMember}</span>;
+    },
   },
   {
     accessorKey: "name",

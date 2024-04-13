@@ -17,6 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { TodoModule } from './todo/todo.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     ProductModule,
     OrderModule,
     DashboardModule,
+    TodoModule,
   ],
   controllers: [AppController, MemberController],
   providers: [
