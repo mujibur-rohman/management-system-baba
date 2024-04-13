@@ -11,6 +11,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'http://103.49.239.73:3000',
       'http://fuzenkbabaparfume.com',
+      'https://fuzenkbabaparfume.com',
     ],
   });
   app.useGlobalPipes(
