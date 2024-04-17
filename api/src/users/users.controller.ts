@@ -6,7 +6,6 @@ import {
   Param,
   Post,
   Put,
-  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -17,7 +16,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { saveAvatarToStorage } from 'src/utils/storage-files';
 import { AccessTokenGuard } from 'src/guards/access-token.guard';
 import { SupplierGuard } from 'src/guards/supplier.guard';
-import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -61,13 +59,15 @@ export class UsersController {
     @UploadedFile()
     avatar: Express.Multer.File,
     @Body() avatarDto: AvatarDto,
-    @Req() request: Request,
   ) {
     if (!avatar) {
       throw new BadRequestException('avatar is required');
     }
 
-    const baseUrl = `${request.protocol}://${request.get('host')}`;
-    return await this.userService.uploadAvatar(avatar, avatarDto, baseUrl);
+    return await this.userService.uploadAvatar(
+      avatar,
+      avatarDto,
+      'https://fuzenkbabaparfume.com/hapi',
+    );
   }
 }
